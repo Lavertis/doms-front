@@ -1,0 +1,116 @@
+import {FC, useEffect, useState} from 'react';
+import useAxios from '../../../hooks/useAxios';
+import {useFormik} from 'formik';
+import {AxiosError, AxiosResponse} from 'axios';
+import * as Yup from 'yup';
+import {Message} from 'primereact/message';
+import FormInput from '../../../components/Form/FormInput';
+import {Button} from 'primereact/button';
+
+const UpdatePatientInfoValidationSchema = Yup.object().shape({
+    firstName: Yup.string()
+        .max(100, 'First name must be at most 100 characters long'),
+    lastName: Yup.string()
+        .max(100, 'Last name must be at most 100 characters long'),
+    email: Yup.string()
+        .email('Email must be valid'),
+    phoneNumber: Yup.string(),
+    dateOfBirth: Yup.date()
+        .max(new Date(), 'Date of birth must be in the past'),
+    userName: Yup.string()
+        .min(4, 'Username must be at least 4 characters long')
+        .max(16, 'Username must be at most 16 characters long'),
+    address: Yup.string()
+        .max(100, 'Address must be at most 100 characters long'),
+    currentPassword: Yup.string()
+        .required('Current password is required'),
+});
+
+
+interface UpdatePatientAccountInfoFormProps {
+}
+
+const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () => {
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const axios = useAxios();
+
+    const formik = useFormik({
+        initialValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            phoneNumber: '',
+            dateOfBirth: '',
+            userName: '',
+            address: '',
+            currentPassword: '',
+        },
+        validationSchema: UpdatePatientInfoValidationSchema,
+        onSubmit: values => {
+            values.dateOfBirth = new Date(values.dateOfBirth).toISOString();
+            axios.patch('patients/current', values)
+                .then(() => {
+                    setSuccess('Account information updated successfully');
+                    setError('');
+                })
+                .catch((err: AxiosError) => {
+                    console.log(err.response?.data);
+                    setSuccess('');
+                    if (!err.response)
+                        return;
+
+                    // TODO add field specific error messages
+
+                    setError(err.response.data.message);
+                });
+
+            formik.setFieldValue('currentPassword', '');
+            formik.setFieldTouched('currentPassword', false);
+            values.dateOfBirth = values.dateOfBirth.split('T')[0];
+        },
+    });
+
+    useEffect(() => {
+        axios.get('patients/current')
+            .then((response: AxiosResponse) => {
+                formik.setValues({
+                    firstName: response.data.firstName,
+                    lastName: response.data.lastName,
+                    email: response.data.email,
+                    phoneNumber: response.data.phoneNumber,
+                    dateOfBirth: response.data.dateOfBirth.split('T')[0],
+                    userName: response.data.userName,
+                    address: response.data.address,
+                    currentPassword: '',
+                });
+            })
+            .catch(() => {
+                setError('Error getting user info');
+                setSuccess('');
+            });
+    }, [axios]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    return (
+        <div>
+            <div className="text-center mb-5">
+                <div className="text-900 text-3xl font-medium mb-3">Update account details</div>
+            </div>
+            {error && <Message className="w-full mb-2" severity="error" text={error}/>}
+            {success && <Message className="w-full mb-2" severity="success" text={success}/>}
+            <form onSubmit={formik.handleSubmit}>
+                <FormInput formik={formik} label={'First name'} id={'firstName'}/>
+                <FormInput formik={formik} label={'Last name'} id={'lastName'}/>
+                <FormInput formik={formik} label={'Email'} id={'email'} type={'email'}/>
+                <FormInput formik={formik} label={'Phone number'} id={'phoneNumber'} type={'tel'}/>
+                <FormInput formik={formik} label={'Username'} id={'userName'}/>
+                <FormInput formik={formik} label={'Date of birth'} id={'dateOfBirth'} type={'date'}/>
+                <FormInput formik={formik} label={'Current password'} id={'currentPassword'} type={'password'}/>
+
+                <Button label="Update" type="submit" className="w-full"/>
+            </form>
+        </div>
+    );
+};
+
+export default UpdatePatientAccountInfoForm;

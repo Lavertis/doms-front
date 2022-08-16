@@ -61,6 +61,7 @@ const Navbar: FC<NavbarProps> = () => {
         },
         {
             label: 'Account', icon: 'pi pi-fw pi-cog', command: () => {
+                navigate('/account');
             }
         },
         logoutItem
@@ -81,6 +82,7 @@ const Navbar: FC<NavbarProps> = () => {
         },
         {
             label: 'Account', icon: 'pi pi-fw pi-cog', command: () => {
+                navigate('/account');
             }
         },
         logoutItem

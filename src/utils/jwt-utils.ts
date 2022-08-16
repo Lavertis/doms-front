@@ -4,7 +4,7 @@ export const getRoleFromToken = (token: string): string | null => {
     if (!token)
         return null;
 
-    return getClaimFromToken(token, 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role') as string;
+    return getClaimFromToken(token, 'role') as string;
 };
 
 export const getClaimFromToken = (token: string, field: string): string | number => {
