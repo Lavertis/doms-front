@@ -8,9 +8,10 @@ interface FormInputProps {
     type?: string;
     placeholder?: string;
     className?: string;
+    disabled?: boolean;
 }
 
-const FormInput: FC<FormInputProps> = ({label, id, type, placeholder, formik, className}) => {
+const FormInput: FC<FormInputProps> = ({label, id, type, placeholder, formik, className, disabled}) => {
     type = type || 'text';
     placeholder = placeholder || '';
     className = className || '';
@@ -31,6 +32,7 @@ const FormInput: FC<FormInputProps> = ({label, id, type, placeholder, formik, cl
                 placeholder={placeholder}
                 value={formik.values[id]}
                 onChange={formik.handleChange}
+                disabled={disabled}
             />
             {getFormErrorMessage(id)}
 

@@ -45,6 +45,7 @@ const Navbar: FC<NavbarProps> = () => {
     const doctorNavbarItems = [
         {
             label: 'Appointments', icon: 'pi pi-fw pi-bookmark', command: () => {
+                navigate('/appointments');
             }
         },
         {

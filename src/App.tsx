@@ -5,8 +5,11 @@ import {isTokenExpired} from './utils/jwt-utils';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
-import AccountManagement from './pages/AccountManagement/AccountManagement';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+import DoctorAppointmentsTable from './pages/Appointments/DoctorAppointmentsTable';
+import AppointmentEdit from './pages/Appointments/AppointmentEdit';
+import AccountManagement from './pages/AccountManagement/AccountManagement';
+import ManageAppointment from "./pages/Appointments/ManageAppointment/ManageAppointment";
 
 
 export const TokenContext = React.createContext<{ token: string; setToken: Dispatch<SetStateAction<string>>; }>(
@@ -40,6 +43,12 @@ function App() {
                     <Routes>
                         <Route path="/login" element={<Login redirectTo="/"/>}/>
                         <Route path="/register" element={<Register redirectTo="/"/>}/>
+
+                        <Route element={<ProtectedRoute allowedRoles={['Doctor']}/>}>
+                            <Route path="/appointments" element={<DoctorAppointmentsTable/>}/>
+                            <Route path="/appointments/:id/edit" element={<AppointmentEdit/>}/>
+                            <Route path="/appointments/:id" element={<ManageAppointment/>}/>
+                        </Route>
 
                         <Route element={<ProtectedRoute allowedRoles={['Patient', 'Doctor']}/>}>
                             <Route path="/account" element={<AccountManagement/>}/>
