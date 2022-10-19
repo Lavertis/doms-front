@@ -36,8 +36,20 @@ const Navbar: FC<NavbarProps> = () => {
 
     const adminNavbarItems = [
         {
-            label: 'Users', icon: 'pi pi-fw pi-users', command: () => {
-            }
+            label: 'Users', icon: 'pi pi-fw pi-users',
+            items: [
+                {
+                    label: 'User management', icon: 'pi pi-fw pi-cog', command: () => {
+                        navigate('/users');
+                    }
+                },
+                {
+                    label: 'Add doctor', icon: 'pi pi-fw pi-plus', command: () => {
+                        navigate('/doctors/add');
+                    }
+                }
+            ],
+
         },
         logoutItem
     ];
