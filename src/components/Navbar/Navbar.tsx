@@ -70,6 +70,7 @@ const Navbar: FC<NavbarProps> = () => {
         },
         {
             label: 'Users', icon: 'pi pi-fw pi-users', command: () => {
+                navigate('/users');
             }
         },
         {

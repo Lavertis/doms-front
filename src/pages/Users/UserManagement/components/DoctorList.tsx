@@ -16,9 +16,10 @@ interface DoctorListProps {
     totalRecords: number;
     lazyParams: LazyParams;
     setLazyParams: (lazyParams: LazyParams) => void;
+    allowDelete?: boolean;
 }
 
-const DoctorList = ({doctors, loading, lazyParams, setLazyParams, totalRecords}: DoctorListProps) => {
+const DoctorList = ({doctors, loading, lazyParams, setLazyParams, totalRecords, allowDelete}: DoctorListProps) => {
     const navigate = useNavigate();
     const axios = useAxios();
     const deleteDoctor = (doctorId: string) => {

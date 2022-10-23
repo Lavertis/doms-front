@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import useAxios from "../../../hooks/useAxios";
 import {TabPanel, TabView} from "primereact/tabview";
 import DoctorList from "./components/DoctorList";
@@ -8,9 +8,13 @@ import {Doctor} from "../../../types/doctor";
 import {Patient} from "../../../types/patient";
 import {LazyParams} from "../../../types/data-table";
 import {AxiosError} from "axios";
+import {TokenContext} from "../../../App";
+import {getRoleFromToken} from "../../../utils/jwt-utils";
 
 const UserManagement = () => {
     const axios = useAxios();
+    const {token} = useContext(TokenContext);
+    const role = getRoleFromToken(token);
 
     const [doctorsLoading, setDoctorsLoading] = useState(false);
     const [patientsLoading, setPatientsLoading] = useState(false);
@@ -75,6 +79,9 @@ const UserManagement = () => {
     }, [axios, patientListLazyParams]);
 
     useEffect(() => {
+        if (role !== 'Admin')
+            return;
+
         setDoctorsLoading(true);
         const queryParams = {
             pageNumber: doctorListLazyParams.page + 1,
@@ -101,20 +108,11 @@ const UserManagement = () => {
                 setDoctorsLoading(false);
             }
         });
-    }, [axios, doctorListLazyParams]);
+    }, [axios, doctorListLazyParams, role]);
 
     return (
         <div className="my-5 mx-auto xl:col-10">
             <TabView>
-                <TabPanel header="Doctors">
-                    <DoctorList
-                        doctors={doctors}
-                        totalRecords={totalDoctorRecords}
-                        loading={doctorsLoading}
-                        lazyParams={doctorListLazyParams}
-                        setLazyParams={setDoctorListLazyParams}
-                    />
-                </TabPanel>
                 <TabPanel header="Patients">
                     <PatientList
                         patients={patients}
@@ -122,8 +120,20 @@ const UserManagement = () => {
                         loading={patientsLoading}
                         lazyParams={patientListLazyParams}
                         setLazyParams={setPatientListLazyParams}
+                        allowDelete={role === 'Admin'}
                     />
                 </TabPanel>
+                {role === 'Admin' && <TabPanel header="Doctors">
+                    <DoctorList
+                        doctors={doctors}
+                        totalRecords={totalDoctorRecords}
+                        loading={doctorsLoading}
+                        lazyParams={doctorListLazyParams}
+                        setLazyParams={setDoctorListLazyParams}
+                        allowDelete={role === 'Admin'}
+                    />
+                </TabPanel>
+                }
             </TabView>
         </div>
     );

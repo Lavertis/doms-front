@@ -16,9 +16,10 @@ interface PatientListProps {
     totalRecords: number;
     lazyParams: LazyParams;
     setLazyParams: (lazyParams: LazyParams) => void;
+    allowDelete?: boolean;
 }
 
-const PatientList = ({patients, loading, lazyParams, setLazyParams, totalRecords}: PatientListProps) => {
+const PatientList = ({patients, loading, lazyParams, setLazyParams, totalRecords, allowDelete}: PatientListProps) => {
     const navigate = useNavigate();
     const axios = useAxios();
     const deletePatient = (patientId: string) => {
@@ -39,13 +40,13 @@ const PatientList = ({patients, loading, lazyParams, setLazyParams, totalRecords
     const controlsTemplate = (rowData: Doctor) => {
         const patientId = uuidToBase64(rowData.id);
         return <div className="flex justify-content-center">
-            <Button
+            {allowDelete && <Button
                 className="p-button-danger mr-1"
                 onClick={() => {
                     setCurrentPatientId(patientId);
                     showModal();
                 }}
-                icon="pi pi-trash"/>
+                icon="pi pi-trash"/>}
             <Button
                 onClick={() => navigate(`/patients/${patientId}`)}
                 icon='pi pi-eye'
