@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {Patient} from "../../../../types/patient";
 import {LazyParams} from "../../../../types/data-table";
 import {useNavigate} from "react-router-dom";
-import useAxios from "../../../../hooks/useAxios";
 import {Doctor} from "../../../../types/doctor";
 import {Button} from "primereact/button";
 import {uuidToBase64} from "../../../../utils/uuid-utils";
@@ -21,7 +20,7 @@ interface PatientListProps {
 
 const PatientList = ({patients, loading, lazyParams, setLazyParams, totalRecords, allowDelete}: PatientListProps) => {
     const navigate = useNavigate();
-    const axios = useAxios();
+    // const axios = useAxios();
     const deletePatient = (patientId: string) => {
         console.log("Sending delete request for patient with id: " + patientId);
         // axios.delete(`patients/${patientId}`)

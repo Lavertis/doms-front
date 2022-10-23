@@ -1,8 +1,8 @@
 import {FC, useContext, useEffect, useState} from 'react';
-import {Appointment} from '../../types/appointment';
+import {Appointment} from '../../../types/appointment';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column';
-import useAxios from '../../hooks/useAxios';
+import useAxios from '../../../hooks/useAxios';
 import {AxiosError, AxiosResponse} from 'axios';
 import {FilterMatchMode} from 'primereact/api';
 import {Dropdown} from 'primereact/dropdown';
@@ -10,9 +10,9 @@ import {Button} from 'primereact/button';
 import moment from 'moment';
 import {Calendar} from 'primereact/calendar';
 import {useNavigate} from 'react-router-dom';
-import {uuidToBase64} from '../../utils/uuid-utils';
-import {TokenContext} from "../../App";
-import {getClaimFromToken} from "../../utils/jwt-utils";
+import {uuidToBase64} from '../../../utils/uuid-utils';
+import {TokenContext} from "../../../App";
+import {getClaimFromToken} from "../../../utils/jwt-utils";
 
 interface DoctorAppointmentsTableProps {
 }

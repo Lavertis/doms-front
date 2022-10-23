@@ -1,0 +1,16 @@
+export interface AppointmentSearch {
+    id: string,
+    date: Date,
+    description: string,
+    interview: string,
+    diagnosis: string,
+    recommendations: string,
+    patientId: string,
+    patientFirstName: string,
+    patientLastName: string,
+    doctorId: string,
+    doctorFirstName: string,
+    doctorLastName: string,
+    status: string,
+    type: string,
+}

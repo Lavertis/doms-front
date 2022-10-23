@@ -61,10 +61,6 @@ const Navbar: FC<NavbarProps> = () => {
             }
         },
         {
-            label: 'Prescriptions', icon: 'pi pi-fw pi-book', command: () => {
-            }
-        },
-        {
             label: 'Statistics', icon: 'pi pi-fw pi-chart-bar', command: () => {
             }
         },
@@ -84,6 +80,7 @@ const Navbar: FC<NavbarProps> = () => {
     const patientNavbarItems = [
         {
             label: 'Appointments', icon: 'pi pi-fw pi-bookmark', command: () => {
+                navigate('/appointments');
             }
         },
         {

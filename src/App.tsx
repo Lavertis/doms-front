@@ -6,12 +6,12 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
-import DoctorAppointmentsTable from './pages/Appointments/DoctorAppointmentsTable';
 import AppointmentEdit from './pages/Appointments/AppointmentEdit';
 import AccountManagement from './pages/AccountManagement/AccountManagement';
 import ManageAppointment from "./pages/Appointments/ManageAppointment/ManageAppointment";
 import UserManagement from "./pages/Users/UserManagement/UserManagement";
 import AddDoctor from "./pages/Users/AddDoctor";
+import AppointmentsTable from "./pages/Appointments/AppointmentsTable/AppointmentsTable";
 
 
 export const TokenContext = React.createContext<{ token: string; setToken: Dispatch<SetStateAction<string>>; }>(
@@ -47,9 +47,12 @@ function App() {
                         <Route path="/register" element={<Register redirectTo="/"/>}/>
 
                         <Route element={<ProtectedRoute allowedRoles={['Doctor']}/>}>
-                            <Route path="/appointments" element={<DoctorAppointmentsTable/>}/>
                             <Route path="/appointments/:id/edit" element={<AppointmentEdit/>}/>
                             <Route path="/appointments/:id" element={<ManageAppointment/>}/>
+                        </Route>
+
+                        <Route element={<ProtectedRoute allowedRoles={['Patient', 'Doctor']}/>}>
+                            <Route path="/appointments" element={<AppointmentsTable/>}/>
                         </Route>
 
                         <Route element={<ProtectedRoute allowedRoles={['Patient', 'Doctor']}/>}>
