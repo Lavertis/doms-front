@@ -51,7 +51,7 @@ const AppointmentHistory = ({patientId}: AppointmentHistoryProps) => {
 
         if (patientId === undefined)
             return;
-        axios.get(`appointments/search?patientId=${patientId}`, {params: queryParams})
+        axios.get(`appointments/search?patientId=${patientId}&status=Completed`, {params: queryParams})
             .then((response: AxiosResponse) => {
                 setAppointments(response.data.records);
                 setTotalRecords(response.data.totalRecords);

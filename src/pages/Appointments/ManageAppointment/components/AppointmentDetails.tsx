@@ -63,21 +63,17 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
         },
     });
 
-    // useEffect(() => {
-    //     if (selectedValues.length === 0)
-    //         formik.setFieldValue(fieldName, '');
-    //     else
-    //         formik.setFieldValue(fieldName, selectedValues.map(p => p.name).join(', '));
-    // }, [selectedValues]);
-
     useEffect(() => {
         axios.get(`appointments/user/current/${appointmentId}`)
             .then((response: AxiosResponse<Appointment>) => {
                 const appointment = response.data;
                 setAppointment(appointment);
-                formik.setFieldValue('interview', appointment.interview);
-                formik.setFieldValue('diagnosis', appointment.diagnosis);
-                formik.setFieldValue('recommendations', appointment.recommendations);
+                if (appointment.interview != null)
+                    formik.setFieldValue('interview', appointment.interview);
+                if (appointment.diagnosis != null)
+                    formik.setFieldValue('diagnosis', appointment.diagnosis);
+                if (appointment.recommendations != null)
+                    formik.setFieldValue('recommendations', appointment.recommendations);
             })
             .catch((err: AxiosError<ErrorResult>) => {
                 if (err.response?.data.error != null)
