@@ -4,7 +4,6 @@ import {Button} from 'primereact/button';
 import {useNavigate} from 'react-router-dom';
 import useAxios from '../../hooks/useAxios';
 import {useFormik} from 'formik';
-import {AxiosError} from 'axios';
 import * as Yup from 'yup';
 import {TokenContext} from '../../App';
 import FormInput from '../../components/Form/FormInput';
@@ -80,7 +79,7 @@ const Register: FC<RegisterProps> = ({redirectTo}) => {
                         navigate(redirectTo, {replace: true});
                     }, 10_000);
                 })
-                .catch((err: AxiosError) => {
+                .catch(err => {
                     if (err.response?.data.error != null)
                         setError(err.response.data.error)
                     if (err.response?.data.errors != null)

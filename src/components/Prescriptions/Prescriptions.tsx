@@ -21,8 +21,8 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
 
     return (
         <Accordion>
-            {prescriptions.map(prescription =>
-                <AccordionTab header={moment(prescription?.createdAt).toString()} key={prescription.id}>
+            {prescriptions.map((prescription, idx) =>
+                <AccordionTab header={moment(prescription?.createdAt).toString()} key={prescription.id} tabIndex={idx}>
                     <div className="flex justify-content-between align-items-center mb-3">
                         <div>
                             <span className="font-bold">Fulfillment date: </span>

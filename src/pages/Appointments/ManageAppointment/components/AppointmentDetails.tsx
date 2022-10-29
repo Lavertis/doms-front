@@ -54,7 +54,7 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                 .then((response: AxiosResponse<Appointment>) => {
                     setAppointment(response.data);
                 })
-                .catch((err: AxiosError) => {
+                .catch(err => {
                     if (err.response?.data.error != null)
                         console.log(err.response.data.error);
                     if (err.response?.data.errors != null)

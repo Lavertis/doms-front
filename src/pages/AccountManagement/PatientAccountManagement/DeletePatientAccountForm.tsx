@@ -2,7 +2,6 @@ import {FC, useState} from 'react';
 import useAxios from '../../../hooks/useAxios';
 import {useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
-import {AxiosError} from 'axios';
 import {Message} from 'primereact/message';
 import FormInput from '../../../components/Form/FormInput';
 import {Button} from 'primereact/button';
@@ -26,7 +25,7 @@ const DeletePatientAccountForm: FC<DeletePatientAccountFormProps> = () => {
                     setError('');
                     navigate('/');
                 })
-                .catch((err: AxiosError) => {
+                .catch(err => {
                     if (!err.response)
                         return;
                     setError(err.response.data.message);

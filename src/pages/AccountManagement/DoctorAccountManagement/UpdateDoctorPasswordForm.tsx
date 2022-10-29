@@ -2,7 +2,6 @@ import {FC, useState} from 'react';
 import * as Yup from 'yup';
 import useAxios from '../../../hooks/useAxios';
 import {useFormik} from 'formik';
-import {AxiosError} from 'axios';
 import {Message} from 'primereact/message';
 import FormInput from '../../../components/Form/FormInput';
 import {Button} from 'primereact/button';
@@ -40,7 +39,7 @@ const UpdateDoctorPasswordForm: FC<UpdateDoctorPasswordFormProps> = () => {
                     setSuccess('Account information updated successfully');
                     setError('');
                 })
-                .catch((err: AxiosError) => {
+                .catch(err => {
                     setSuccess('');
                     setError('');
                     if (!err.response)

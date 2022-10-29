@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useState} from 'react';
 import useAxios from '../../../hooks/useAxios';
 import {useFormik} from 'formik';
-import {AxiosError, AxiosResponse} from 'axios';
+import {AxiosResponse} from 'axios';
 import * as Yup from 'yup';
 import {Message} from 'primereact/message';
 import FormInput from '../../../components/Form/FormInput';
@@ -58,7 +58,7 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
                     setSuccess('Account information updated successfully');
                     setError('');
                 })
-                .catch((err: AxiosError) => {
+                .catch(err => {
                     console.log(err.response?.data);
                     setSuccess('');
                     if (!err.response)

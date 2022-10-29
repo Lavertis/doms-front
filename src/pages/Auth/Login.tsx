@@ -4,7 +4,7 @@ import {TokenContext} from '../../App';
 import {useNavigate} from 'react-router-dom';
 import useAxios from '../../hooks/useAxios';
 import {useFormik} from 'formik';
-import {AxiosError, AxiosResponse} from 'axios';
+import {AxiosResponse} from 'axios';
 import {Button} from 'primereact/button';
 import {Message} from 'primereact/message';
 import FormInput from '../../components/Form/FormInput';
@@ -38,7 +38,7 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
                     localStorage.setItem('refreshToken', response.data.refreshToken);
                     navigate(redirectTo, {replace: true});
                 })
-                .catch((err: AxiosError) => {
+                .catch(err => {
                     setError(err.response?.data.error);
                 });
         },

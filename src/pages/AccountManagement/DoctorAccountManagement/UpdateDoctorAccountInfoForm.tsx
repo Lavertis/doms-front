@@ -1,6 +1,6 @@
 import {FC, useEffect, useState} from 'react';
 import * as Yup from 'yup';
-import {AxiosError, AxiosResponse} from 'axios';
+import {AxiosResponse} from 'axios';
 import {useFormik} from 'formik';
 import useAxios from '../../../hooks/useAxios';
 import {Message} from 'primereact/message';
@@ -42,7 +42,7 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
                     setSuccess('Account information updated successfully');
                     setError('');
                 })
-                .catch((err: AxiosError) => {
+                .catch(err => {
                     console.log(err.response?.data);
                     setSuccess('');
                     setError('');
