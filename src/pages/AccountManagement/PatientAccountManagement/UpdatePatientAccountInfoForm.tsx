@@ -1,4 +1,4 @@
-import {FC, useEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import useAxios from '../../../hooks/useAxios';
 import {useFormik} from 'formik';
 import {AxiosError, AxiosResponse} from 'axios';
@@ -17,6 +17,9 @@ const UpdatePatientInfoValidationSchema = Yup.object().shape({
     phoneNumber: Yup.string(),
     dateOfBirth: Yup.date()
         .max(new Date(), 'Date of birth must be in the past'),
+    nationalId: Yup.string()
+        .required('National ID is required')
+        .length(11, 'National ID must be 11 characters long'),
     userName: Yup.string()
         .min(4, 'Username must be at least 4 characters long')
         .max(16, 'Username must be at most 16 characters long'),
@@ -42,6 +45,7 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
             email: '',
             phoneNumber: '',
             dateOfBirth: '',
+            nationalId: '',
             userName: '',
             address: '',
             currentPassword: '',
@@ -80,6 +84,7 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
                     email: response.data.email,
                     phoneNumber: response.data.phoneNumber,
                     dateOfBirth: response.data.dateOfBirth.split('T')[0],
+                    nationalId: response.data.nationalId,
                     userName: response.data.userName,
                     address: response.data.address,
                     currentPassword: '',
@@ -105,6 +110,7 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
                 <FormInput formik={formik} label={'Phone number'} id={'phoneNumber'} type={'tel'}/>
                 <FormInput formik={formik} label={'Username'} id={'userName'}/>
                 <FormInput formik={formik} label={'Date of birth'} id={'dateOfBirth'} type={'date'}/>
+                <FormInput formik={formik} id="nationalId" label="National ID"/>
                 <FormInput formik={formik} label={'Current password'} id={'currentPassword'} type={'password'}/>
 
                 <Button label="Update" type="submit" className="w-full"/>

@@ -1,4 +1,4 @@
 export interface ErrorResult {
     error: string;
-    errors: Map<string, string[]>;
+    errors: { [k: string]: string; };
 }

@@ -1,5 +1,5 @@
 interface FormError {
-    errors: Map<string, string[]>;
+    errors: { [k: string]: string; };
 }
 
 interface FormikErorrs {
@@ -8,9 +8,9 @@ interface FormikErorrs {
 
 export const formatErrorsForFormik = (formError: FormError) => {
     const formikErrors: FormikErorrs = {};
-    formError.errors.forEach((value, fieldName) => {
+    for (const [fieldName, values] of Object.entries(formError.errors)) {
         const fieldNameLowerCased = fieldName.charAt(0).toLowerCase() + fieldName.slice(1);
-        formikErrors[fieldNameLowerCased] = value[0];
-    });
+        formikErrors[fieldNameLowerCased] = values[0];
+    }
     return formikErrors;
 }

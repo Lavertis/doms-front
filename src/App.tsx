@@ -12,6 +12,9 @@ import ManageAppointment from "./pages/Appointments/ManageAppointment/ManageAppo
 import UserManagement from "./pages/Users/UserManagement/UserManagement";
 import AddDoctor from "./pages/Users/AddDoctor";
 import AppointmentsTable from "./pages/Appointments/AppointmentsTable/AppointmentsTable";
+import ConfirmEmail from "./pages/Auth/ConfirmEmail";
+import NewPassword from "./pages/Auth/NewPassword";
+import PasswordReset from "./pages/Auth/PasswordReset";
 
 
 export const TokenContext = React.createContext<{ token: string; setToken: Dispatch<SetStateAction<string>>; }>(
@@ -44,7 +47,10 @@ function App() {
                 <Layout>
                     <Routes>
                         <Route path="/login" element={<Login redirectTo="/"/>}/>
-                        <Route path="/register" element={<Register redirectTo="/"/>}/>
+                        <Route path="/register" element={<Register redirectTo="/login"/>}/>
+                        <Route path="/confirm-email" element={<ConfirmEmail redirectTo="/login"/>}/>
+                        <Route path="/password-reset" element={<PasswordReset redirectTo="/login"/>}/>
+                        <Route path="/password-reset/new" element={<NewPassword redirectTo="/login"/>}/>
 
                         <Route element={<ProtectedRoute allowedRoles={['Doctor']}/>}>
                             <Route path="/appointments/:id/edit" element={<AppointmentEdit/>}/>

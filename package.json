@@ -28,7 +28,8 @@
     "url-safe-base64": "^1.2.0",
     "uuid": "^8.3.2",
     "web-vitals": "^2.1.4",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "yup-password": "^0.2.2"
   },
   "scripts": {
     "start": "react-scripts start",

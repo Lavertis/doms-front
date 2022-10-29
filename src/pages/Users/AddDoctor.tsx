@@ -3,20 +3,19 @@ import {Button} from "primereact/button";
 import {classNames} from "primereact/utils";
 import {useFormik} from "formik";
 import {InputText} from "primereact/inputtext";
-import {Password} from "primereact/password";
-import {Divider} from "primereact/divider";
 import * as Yup from 'yup';
 import useAxios from "../../hooks/useAxios";
 import {useNavigate} from "react-router-dom";
+import {formatErrorsForFormik} from "../../utils/error-utils";
+import YupPassword from "yup-password";
 
+YupPassword(Yup);
 const addDoctorValidationSchema = Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
     lastName: Yup.string().required('Last name is required'),
     phoneNumber: Yup.string().required('Phone number is required'),
     userName: Yup.string().required('Username is required'),
-    email: Yup.string().email('Invalid email').required('Email is required'),
-    password: Yup.string().required('Password is required'),
-    confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match')
+    email: Yup.string().email('Invalid email').required('Email is required')
 });
 
 const AddDoctor = () => {
@@ -27,8 +26,6 @@ const AddDoctor = () => {
         initialValues: {
             userName: '',
             email: '',
-            password: '',
-            confirmPassword: '',
             phoneNumber: '',
             firstName: '',
             lastName: ''
@@ -36,10 +33,18 @@ const AddDoctor = () => {
         validationSchema: addDoctorValidationSchema,
         onSubmit: values => {
             console.log(values);
-            axios.post('doctors', values).then((response) => {
-                console.log(response);
-                navigate('/users', {replace: true});
-            });
+            axios.post('doctors', values)
+                .then((response) => {
+                    navigate('/users', {replace: true});
+                })
+                .catch(err => {
+                    if (err.response?.data.error != null)
+                        console.log(err.response.data.error);
+                    if (err.response?.data.errors != null)
+                        console.log(err.response.data);
+                    console.log(formatErrorsForFormik(err.response.data));
+                    formik.setErrors(formatErrorsForFormik(err.response.data));
+                })
         }
     });
 
@@ -48,20 +53,6 @@ const AddDoctor = () => {
         return isFormFieldValid(name) &&
             <small className="p-error">{formik.errors[name as keyof typeof formik.errors]}</small>;
     };
-
-    const passwordHeader = <h6>Pick a password</h6>;
-    const passwordFooter = (
-        <React.Fragment>
-            <Divider/>
-            <p className="mt-2">Suggestions</p>
-            <ul className="pl-2 ml-2 mt-0" style={{lineHeight: '1.5'}}>
-                <li>At least one lowercase</li>
-                <li>At least one uppercase</li>
-                <li>At least one numeric</li>
-                <li>Minimum 8 characters</li>
-            </ul>
-        </React.Fragment>
-    );
 
     return (
         <div className="flex justify-content-center mt-8">
@@ -119,28 +110,6 @@ const AddDoctor = () => {
                                    className={classNames({'p-error': isFormFieldValid('email')})}>Email</label>
                         </div>
                         {getFormErrorMessage('email')}
-                    </div>
-                    <div className="field mb-4">
-                        <div className="p-float-label">
-                            <Password id="password" name="password" value={formik.values.password}
-                                      onChange={formik.handleChange} toggleMask
-                                      className={classNames({'p-invalid': isFormFieldValid('password')})}
-                                      header={passwordHeader} footer={passwordFooter}/>
-                            <label htmlFor="password"
-                                   className={classNames({'p-error': isFormFieldValid('password')})}>Password</label>
-                        </div>
-                        {getFormErrorMessage('password')}
-                    </div>
-                    <div className="field mb-4">
-                        <div className="p-float-label">
-                            <InputText id="confirmPassword" name="confirmPassword" value={formik.values.confirmPassword}
-                                       onChange={formik.handleChange} type="password"
-                                       className={classNames({'p-invalid': isFormFieldValid('confirmPassword')})}/>
-                            <label htmlFor="confirmPassword"
-                                   className={classNames({'p-error': isFormFieldValid('confirmPassword')})}>
-                                Confirm password</label>
-                        </div>
-                        {getFormErrorMessage('confirmPassword')}
                     </div>
                     <Button type="submit" label="Create" className="mt-2"/>
                 </form>

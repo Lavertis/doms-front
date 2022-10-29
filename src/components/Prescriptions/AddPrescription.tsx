@@ -43,11 +43,11 @@ const AddPrescription = ({patientId, appointmentId, drugItems, setDrugItems}: Ad
                 })
         },
     });
-    const toast = useRef(null);
+    const toast = useRef<Toast>(null);
 
     const showError = (message: string) => {
-        if (toast.current) // TODO: don't use as any
-            (toast.current as any).show({severity: 'error', summary: 'Error Message', detail: message, life: 3000});
+        if (toast.current)
+            (toast.current).show({severity: 'error', summary: 'Error Message', detail: message, life: 3000});
     }
 
     const addDrug = () => {

@@ -29,6 +29,8 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
     const formik = useFormik({
         initialValues: {
             email: '',
+            firstName: '',
+            lastName: '',
             phoneNumber: '',
             userName: '',
             currentPassword: '',
@@ -60,6 +62,8 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
             .then((response: AxiosResponse) => {
                 formik.setValues({
                     email: response.data.email,
+                    firstName: response.data.firstName,
+                    lastName: response.data.lastName,
                     phoneNumber: response.data.phoneNumber,
                     userName: response.data.userName,
                     currentPassword: '',
@@ -80,6 +84,8 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
             {success && <Message className="w-full mb-2" severity="success" text={success}/>}
             <form onSubmit={formik.handleSubmit}>
                 <FormInput formik={formik} label={'Email'} id={'email'} type={'email'}/>
+                <FormInput formik={formik} label={'First name'} id={'firstName'}/>
+                <FormInput formik={formik} label={'Last name'} id={'lastName'}/>
                 <FormInput formik={formik} label={'Phone number'} id={'phoneNumber'} type={'tel'}/>
                 <FormInput formik={formik} label={'Username'} id={'userName'}/>
                 <FormInput formik={formik} label={'Current password'} id={'currentPassword'} type={'password'}/>

@@ -10,7 +10,7 @@ import {Message} from 'primereact/message';
 import FormInput from '../../components/Form/FormInput';
 
 const LoginSchema = Yup.object().shape({
-    userName: Yup.string().required('Username is required'),
+    login: Yup.string().required('login is required'),
     password: Yup.string().required('Password is required'),
 });
 
@@ -26,7 +26,7 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
 
     const formik = useFormik({
         initialValues: {
-            userName: '',
+            login: '',
             password: ''
         },
         validationSchema: LoginSchema,
@@ -39,11 +39,7 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
                     navigate(redirectTo, {replace: true});
                 })
                 .catch((err: AxiosError) => {
-                    if (err.response && err.response.status === 400) {
-                        setError('Invalid username or password');
-                    } else {
-                        setError('An error occurred');
-                    }
+                    setError(err.response?.data.error);
                 });
         },
     });
@@ -55,25 +51,33 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
     }, [navigate, redirectTo, token]);
 
     return (
-        <div className="surface-card p-4 shadow-2 border-round w-full lg:w-4 mx-auto mt-8">
+        <div className="surface-card p-5 shadow-2 border-round w-11 sm:w-7 lg:w-5 xl:w-4 mx-auto mt-8">
             <div className="text-center mb-5">
                 {/*TODO Logo here*/}
                 {/*<img src="" alt="hyper" height={50} className="mb-3" />*/}
                 <div className="text-900 text-3xl font-medium mb-3">Welcome Back</div>
                 <span className="text-600 font-medium line-height-3">Don't have an account?</span>
-                <div className="font-medium no-underline ml-2 text-blue-500 cursor-pointer" onClick={() => {
-                    navigate('register');
-                }}>Create today!
+                <div className="font-medium no-underline text-blue-500 cursor-pointer"
+                     onClick={() => {
+                         navigate('/register');
+                     }}>
+                    Create today!
                 </div>
             </div>
             {error && <Message className="w-full mb-2" severity="error" text={error}/>}
             <form onSubmit={formik.handleSubmit}>
-                <FormInput formik={formik} id="userName" label="Username"/>
+                <FormInput formik={formik} id="login" label="Login"/>
                 <FormInput formik={formik} id="password" label="Password" type="password"/>
+                <div className="text-600 font-medium line-height-3 text-center">Forgot password?</div>
+                <div className="font-medium no-underline text-blue-500 cursor-pointer text-center mb-3"
+                     onClick={() => {
+                         navigate('/password-reset');
+                     }}>
+                    Click to reset
+                </div>
                 <Button label="Sign In" icon="pi pi-user" type="submit" className="w-full"/>
             </form>
         </div>
-
     );
 };
 
