@@ -5,7 +5,7 @@ import {Prescription} from "../../../../types/prescription";
 import {Drug} from "../../../../types/drugs";
 
 interface PrescriptionsPanelContentProps {
-    appointmentId: string;
+    appointmentId?: string;
     patientId: string;
     prescriptions: Prescription[];
     setPrescriptions: (prescriptions: Prescription[]) => void;
@@ -24,12 +24,14 @@ const PrescriptionsPanelContent = ({
 
     return (
         <div>
-            <AddPrescription
-                patientId={patientId}
-                appointmentId={appointmentId}
-                drugItems={drugItems}
-                setDrugItems={setDrugItems}
-            />
+            <div className="surface-card p-4 shadow-2 border-round w-full">
+                <AddPrescription
+                    patientId={patientId}
+                    appointmentId={appointmentId}
+                    drugItems={drugItems}
+                    setDrugItems={setDrugItems}
+                />
+            </div>
             <div className="surface-card p-4 shadow-2 border-round w-full mt-5">
                 <div className="text-center mb-5">
                     <div className="text-900 text-2xl font-medium mb-3">

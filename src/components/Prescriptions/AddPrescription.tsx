@@ -10,7 +10,7 @@ import useAxios from "../../hooks/useAxios";
 
 interface AddPrescriptionProps {
     patientId: string,
-    appointmentId: string,
+    appointmentId?: string,
     drugItems: Drug[],
     setDrugItems: (drugItems: Drug[]) => void
 }
@@ -75,15 +75,13 @@ const AddPrescription = ({patientId, appointmentId, drugItems, setDrugItems}: Ad
     }
 
     return (
-        <div className="surface-card p-4 shadow-2 border-round w-full">
+        <div>
             <Toast ref={toast}/>
-            <div className="text-center mb-5">
-                <div className="text-900 text-2xl font-medium mb-3">New prescription</div>
-                <hr/>
+            <div className="text-900 text-2xl font-medium text-black-alpha-80 text-center mb-3">
+                New prescription
             </div>
-            <button onClick={() => console.log(drugItems)} className="mr-auto" type="button">Drug Items</button>
             <form onSubmit={formik.handleSubmit} className="flex flex-column">
-                <div className="col-12 md:col-6 pl-0">
+                <div className="col-12 md:col-6 pl-0 mb-3">
                     <label htmlFor="fulfillmentDeadline" className="block text-900 font-medium mb-2">
                         Fulfillment deadline
                     </label>

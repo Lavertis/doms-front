@@ -45,7 +45,8 @@ const PatientList = ({patients, loading, lazyParams, setLazyParams, totalRecords
                     setCurrentPatientId(patientId);
                     showModal();
                 }}
-                icon="pi pi-trash"/>}
+                icon="pi pi-trash"/>
+            }
             <Button
                 onClick={() => navigate(`/patients/${patientId}`)}
                 icon='pi pi-eye'

@@ -15,6 +15,8 @@ import AppointmentsTable from "./pages/Appointments/AppointmentsTable/Appointmen
 import ConfirmEmail from "./pages/Auth/ConfirmEmail";
 import NewPassword from "./pages/Auth/NewPassword";
 import PasswordReset from "./pages/Auth/PasswordReset";
+import PatientDetails from "./pages/Users/Patient/PatientDetails/PatientDetails";
+import DoctorDetails from "./pages/Users/Doctor/DoctorDetails/DoctorDetails";
 
 
 export const TokenContext = React.createContext<{ token: string; setToken: Dispatch<SetStateAction<string>>; }>(
@@ -55,18 +57,18 @@ function App() {
                         <Route element={<ProtectedRoute allowedRoles={['Doctor']}/>}>
                             <Route path="/appointments/:id/edit" element={<AppointmentEdit/>}/>
                             <Route path="/appointments/:id" element={<ManageAppointment/>}/>
+
                         </Route>
 
                         <Route element={<ProtectedRoute allowedRoles={['Patient', 'Doctor']}/>}>
                             <Route path="/appointments" element={<AppointmentsTable/>}/>
-                        </Route>
-
-                        <Route element={<ProtectedRoute allowedRoles={['Patient', 'Doctor']}/>}>
                             <Route path="/account" element={<AccountManagement/>}/>
                         </Route>
 
                         <Route element={<ProtectedRoute allowedRoles={['Admin', 'Doctor']}/>}>
                             <Route path="/users" element={<UserManagement/>}/>
+                            <Route path="/patients/:id" element={<PatientDetails/>}/>
+                            <Route path="/doctors/:id" element={<DoctorDetails/>}/>
                         </Route>
 
                         <Route element={<ProtectedRoute allowedRoles={['Admin']}/>}>

@@ -40,13 +40,14 @@ const DoctorList = ({doctors, loading, lazyParams, setLazyParams, totalRecords, 
     const controlsTemplate = (rowData: Doctor) => {
         const doctorId = rowData.id;
         return <div className="flex justify-content-center">
-            <Button
+            {allowDelete && <Button
                 className="p-button-danger mr-1"
                 onClick={() => {
                     setCurrentDoctorId(doctorId);
                     showModal();
                 }}
                 icon="pi pi-trash"/>
+            }
             <Button
                 onClick={() => navigate(`/doctors/${doctorId}`)}
                 icon='pi pi-eye'

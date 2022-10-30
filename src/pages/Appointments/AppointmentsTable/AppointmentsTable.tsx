@@ -17,7 +17,7 @@ const AppointmentsTable = () => {
     }
 
     return (
-        <div className="xl:col-9 mx-auto">
+        <div className="col-11 xl:col-9 mx-auto">
             {role === 'Doctor' ? doctorAppointmentsTable() : patientAppointmentsTable()}
         </div>
     );

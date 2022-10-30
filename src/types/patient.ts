@@ -7,5 +7,6 @@ export interface Patient {
     email: string,
     phoneNumber: string,
     address: string,
-    dateOfBirth: string,
+    dateOfBirth: Date,
+    createdAt: Date,
 }
