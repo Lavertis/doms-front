@@ -75,7 +75,7 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
                      }}>
                     Click to reset
                 </div>
-                <Button label="Sign In" icon="pi pi-user" type="submit" className="w-full"/>
+                <Button label="Sign In &nbsp;&nbsp;&nbsp;&nbsp;" icon="pi pi-user" type="submit" className="w-full"/>
             </form>
         </div>
     );

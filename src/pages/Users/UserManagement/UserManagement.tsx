@@ -111,7 +111,7 @@ const UserManagement = () => {
     }, [axios, doctorListLazyParams, role]);
 
     return (
-        <div className="my-5 mx-auto xl:col-10">
+        <div className="my-5 mx-auto col-11 xl:col-10">
             <TabView>
                 <TabPanel header="Patients">
                     <PatientList

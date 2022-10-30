@@ -11,9 +11,6 @@ const UpdateDoctorInfoValidationSchema = Yup.object().shape({
     email: Yup.string()
         .email('Email must be valid'),
     phoneNumber: Yup.string(),
-    userName: Yup.string()
-        .min(4, 'Username must be at least 4 characters long')
-        .max(16, 'Username must be at most 16 characters long'),
     currentPassword: Yup.string()
         .required('Current password is required'),
 });
@@ -32,7 +29,6 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
             firstName: '',
             lastName: '',
             phoneNumber: '',
-            userName: '',
             currentPassword: '',
         },
         validationSchema: UpdateDoctorInfoValidationSchema,
@@ -65,7 +61,6 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
                     firstName: response.data.firstName,
                     lastName: response.data.lastName,
                     phoneNumber: response.data.phoneNumber,
-                    userName: response.data.userName,
                     currentPassword: '',
                 });
             })
@@ -87,7 +82,6 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
                 <FormInput formik={formik} label={'First name'} id={'firstName'}/>
                 <FormInput formik={formik} label={'Last name'} id={'lastName'}/>
                 <FormInput formik={formik} label={'Phone number'} id={'phoneNumber'} type={'tel'}/>
-                <FormInput formik={formik} label={'Username'} id={'userName'}/>
                 <FormInput formik={formik} label={'Current password'} id={'currentPassword'} type={'password'}/>
 
                 <Button label="Update" type="submit" className="w-full"/>

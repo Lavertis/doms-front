@@ -43,13 +43,13 @@ const PatientAppointmentsTable = () => {
     const [currentAppointmentId, setCurrentAppointmentId] = useState('');
 
     const cancelAppointment = () => {
-        console.log("Sending cancel request for appointment with id: " + currentAppointmentId);
         axios.patch(`appointments/user/current/${currentAppointmentId}`, {status: 'Cancelled'})
             .then(() => {
                 setLazyParams({...lazyParams});
-            }).catch((err: AxiosError) => {
-            console.log(err);
-        });
+            })
+            .catch((err: AxiosError) => {
+                console.log(err);
+            });
     }
 
     useEffect(() => {

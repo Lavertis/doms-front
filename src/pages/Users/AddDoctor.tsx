@@ -14,7 +14,6 @@ const addDoctorValidationSchema = Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
     lastName: Yup.string().required('Last name is required'),
     phoneNumber: Yup.string().required('Phone number is required'),
-    userName: Yup.string().required('Username is required'),
     email: Yup.string().email('Invalid email').required('Email is required')
 });
 
@@ -24,7 +23,6 @@ const AddDoctor = () => {
 
     const formik = useFormik({
         initialValues: {
-            userName: '',
             email: '',
             phoneNumber: '',
             firstName: '',
@@ -34,16 +32,14 @@ const AddDoctor = () => {
         onSubmit: values => {
             console.log(values);
             axios.post('doctors', values)
-                .then((response) => {
+                .then(() => {
                     navigate('/users', {replace: true});
                 })
                 .catch(err => {
                     if (err.response?.data.error != null)
                         console.log(err.response.data.error);
                     if (err.response?.data.errors != null)
-                        console.log(err.response.data);
-                    console.log(formatErrorsForFormik(err.response.data));
-                    formik.setErrors(formatErrorsForFormik(err.response.data));
+                        formik.setErrors(formatErrorsForFormik(err.response.data));
                 })
         }
     });
@@ -89,16 +85,6 @@ const AddDoctor = () => {
                                 number</label>
                         </div>
                         {getFormErrorMessage('phoneNumber')}
-                    </div>
-                    <div className="field mb-4">
-                        <div className="p-float-label">
-                            <InputText id="userName" name="userName" value={formik.values.userName}
-                                       onChange={formik.handleChange}
-                                       className={classNames({'p-invalid': isFormFieldValid('userName')})}/>
-                            <label htmlFor="userName"
-                                   className={classNames({'p-error': isFormFieldValid('userName')})}>UserName</label>
-                        </div>
-                        {getFormErrorMessage('userName')}
                     </div>
                     <div className="field mb-4">
                         <div className="p-float-label p-input-icon-right">

@@ -31,10 +31,6 @@ const RegisterSchema = Yup.object().shape({
     nationalId: Yup.string()
         .required('National ID is required')
         .length(11, 'National ID must be 11 characters long'),
-    userName: Yup.string()
-        .required('Username is required')
-        .min(4, 'Username must be at least 4 characters long')
-        .max(16, 'Username must be at most 16 characters long'),
     address: Yup.string()
         .required('Address is required')
         .max(100, 'Address must be at most 100 characters long'),
@@ -64,7 +60,6 @@ const Register: FC<RegisterProps> = ({redirectTo}) => {
             phoneNumber: '',
             dateOfBirth: '',
             nationalId: '',
-            userName: '',
             address: '',
             password: '',
             confirmPassword: ''
@@ -122,12 +117,11 @@ const Register: FC<RegisterProps> = ({redirectTo}) => {
                 <FormInput formik={formik} id="phoneNumber" label="Phone number" type="tel"/>
                 <FormInput formik={formik} id="dateOfBirth" label="Date of birth" type="date"/>
                 <FormInput formik={formik} id="nationalId" label="National ID"/>
-                <FormInput formik={formik} id="userName" label="Username"/>
                 <FormInput formik={formik} id="address" label="Address"/>
                 <FormInput formik={formik} id="password" label="Password" type="password"/>
                 <FormInput formik={formik} id="confirmPassword" label="Confirm password" type="password"/>
 
-                <Button label="Sign Up" icon="pi pi-user" type="submit" className="w-full"/>
+                <Button label="Sign Up &nbsp;&nbsp;&nbsp;&nbsp;" icon="pi pi-user" type="submit" className="w-full"/>
             </form>
         </div>
     );

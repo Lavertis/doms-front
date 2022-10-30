@@ -4,9 +4,10 @@ import {Column} from "primereact/column";
 import {Doctor} from "../../../../types/doctor";
 import {LazyParams} from "../../../../types/data-table";
 import {Button} from "primereact/button";
-import {uuidToBase64} from "../../../../utils/uuid-utils";
 import {useNavigate} from "react-router-dom";
 import ConfirmationModal from "../../../../components/ConfirmationModal";
+import useAxios from "../../../../hooks/useAxios";
+import {AxiosError} from "axios";
 
 
 interface DoctorListProps {
@@ -20,15 +21,15 @@ interface DoctorListProps {
 
 const DoctorList = ({doctors, loading, lazyParams, setLazyParams, totalRecords, allowDelete}: DoctorListProps) => {
     const navigate = useNavigate();
-    // const axios = useAxios();
+    const axios = useAxios();
     const deleteDoctor = (doctorId: string) => {
-        console.log("Sending delete request for doctor with id: " + doctorId);
-        // axios.delete(`doctors/${doctorId}`)
-        //     .then(() => {
-        //         setLazyParams({...lazyParams});
-        //     }).catch((err: AxiosError) => {
-        //     console.log(err);
-        // });
+        axios.delete(`doctors/${doctorId}`)
+            .then(() => {
+                setLazyParams({...lazyParams});
+            })
+            .catch((err: AxiosError) => {
+                console.log(err);
+            });
     };
     const [currentDoctorId, setCurrentDoctorId] = useState('');
 
@@ -37,7 +38,7 @@ const DoctorList = ({doctors, loading, lazyParams, setLazyParams, totalRecords, 
     const showModal = () => setModalIsShown(true);
 
     const controlsTemplate = (rowData: Doctor) => {
-        const doctorId = uuidToBase64(rowData.id);
+        const doctorId = rowData.id;
         return <div className="flex justify-content-center">
             <Button
                 className="p-button-danger mr-1"

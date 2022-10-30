@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import {Message} from 'primereact/message';
 import FormInput from '../../../components/Form/FormInput';
 import {Button} from 'primereact/button';
+import {formatErrorsForFormik} from "../../../utils/error-utils";
 
 const UpdatePatientInfoValidationSchema = Yup.object().shape({
     firstName: Yup.string()
@@ -20,9 +21,6 @@ const UpdatePatientInfoValidationSchema = Yup.object().shape({
     nationalId: Yup.string()
         .required('National ID is required')
         .length(11, 'National ID must be 11 characters long'),
-    userName: Yup.string()
-        .min(4, 'Username must be at least 4 characters long')
-        .max(16, 'Username must be at most 16 characters long'),
     address: Yup.string()
         .max(100, 'Address must be at most 100 characters long'),
     currentPassword: Yup.string()
@@ -46,7 +44,6 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
             phoneNumber: '',
             dateOfBirth: '',
             nationalId: '',
-            userName: '',
             address: '',
             currentPassword: '',
         },
@@ -61,12 +58,10 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
                 .catch(err => {
                     console.log(err.response?.data);
                     setSuccess('');
-                    if (!err.response)
-                        return;
-
-                    // TODO add field specific error messages
-
-                    setError(err.response.data.message);
+                    if (err.response?.data.error != null)
+                        console.log(err.response.data.error);
+                    if (err.response?.data.errors != null)
+                        formik.setErrors(formatErrorsForFormik(err.response.data));
                 });
 
             formik.setFieldValue('currentPassword', '');
@@ -85,7 +80,6 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
                     phoneNumber: response.data.phoneNumber,
                     dateOfBirth: response.data.dateOfBirth.split('T')[0],
                     nationalId: response.data.nationalId,
-                    userName: response.data.userName,
                     address: response.data.address,
                     currentPassword: '',
                 });
@@ -108,7 +102,6 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
                 <FormInput formik={formik} label={'Last name'} id={'lastName'}/>
                 <FormInput formik={formik} label={'Email'} id={'email'} type={'email'}/>
                 <FormInput formik={formik} label={'Phone number'} id={'phoneNumber'} type={'tel'}/>
-                <FormInput formik={formik} label={'Username'} id={'userName'}/>
                 <FormInput formik={formik} label={'Date of birth'} id={'dateOfBirth'} type={'date'}/>
                 <FormInput formik={formik} id="nationalId" label="National ID"/>
                 <FormInput formik={formik} label={'Current password'} id={'currentPassword'} type={'password'}/>
