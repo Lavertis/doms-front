@@ -13,6 +13,7 @@
     "formik": "^2.2.9",
     "js-base64": "^3.7.2",
     "jwt-decode": "^3.1.2",
+    "mobx-react-lite": "^3.4.0",
     "moment": "^2.29.4",
     "primeflex": "^3.2.1",
     "primeicons": "^6.0.1",

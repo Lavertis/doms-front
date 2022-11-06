@@ -1,21 +1,18 @@
-import {FC, useContext} from 'react';
+import {FC} from 'react';
 import {Menubar} from 'primereact/menubar';
-import {TokenContext} from '../../App';
 import {useNavigate} from 'react-router-dom';
-import {getRoleFromToken} from '../../utils/jwt-utils';
+import userStore from "../../../store/user-store";
+import {observer} from "mobx-react-lite";
 
 interface NavbarProps {
 }
 
 const Navbar: FC<NavbarProps> = () => {
-    const {setToken} = useContext(TokenContext);
     const navigate = useNavigate();
 
     const logoutItem = {
         label: 'Logout', icon: 'pi pi-fw pi-sign-out', command: () => {
-            setToken('');
-            localStorage.setItem('jwtToken', '');
-            localStorage.setItem('refreshToken', '');
+            userStore.logout()
             navigate('/');
         }
     };
@@ -115,7 +112,7 @@ const Navbar: FC<NavbarProps> = () => {
     return (
         <div className="card">
             <Menubar
-                model={getNavbarItemsByRole(getRoleFromToken(localStorage.getItem('jwtToken') || '') || 'Guest')}
+                model={getNavbarItemsByRole(userStore.user?.role || 'Guest')}
                 start={
                     <>{/*TODO Logo here*/}</>
                 }
@@ -124,4 +121,4 @@ const Navbar: FC<NavbarProps> = () => {
     );
 };
 
-export default Navbar;
+export default observer(Navbar);

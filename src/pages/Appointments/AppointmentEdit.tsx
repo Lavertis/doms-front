@@ -1,7 +1,6 @@
 import {FC, useEffect, useState} from 'react';
 import {uuidFromBase64, uuidToBase64} from '../../utils/uuid-utils';
 import {Appointment} from '../../types/appointment';
-import useAxios from '../../hooks/useAxios';
 import {AxiosError, AxiosResponse} from 'axios';
 import {useNavigate, useParams} from 'react-router-dom';
 import FormInput from '../../components/Form/FormInput';
@@ -15,6 +14,7 @@ import * as Yup from 'yup';
 import {Calendar} from 'primereact/calendar';
 import {formatErrorsForFormik} from "../../utils/error-utils";
 import {ErrorResult} from "../../types/error";
+import {authRequest} from "../../services/api.service";
 
 interface AppointmentPageProps {
 }
@@ -29,7 +29,6 @@ const UpdateAppointmentSchema = Yup.object().shape({
 const AppointmentEdit: FC<AppointmentPageProps> = () => {
     const {id} = useParams();
     const [appointment, setAppointment] = useState<Appointment>(null!);
-    const axios = useAxios();
     const navigate = useNavigate();
 
     const formik = useFormik({
@@ -59,7 +58,7 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                 description: values.description,
                 status: values.status
             };
-            axios.patch(`appointments/user/current/${uuidFromBase64(id!)}`, requestBody)
+            authRequest.patch(`appointments/user/current/${uuidFromBase64(id!)}`, requestBody)
                 .then((response: AxiosResponse<Appointment>) => {
                     setAppointment(response.data);
                 })
@@ -82,7 +81,7 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
     };
 
     useEffect(() => {
-        axios.get(`appointments/user/current/${uuidFromBase64(id!)}`)
+        authRequest.get(`appointments/user/current/${uuidFromBase64(id!)}`)
             .then((response: AxiosResponse<Appointment>) => {
                 setAppointment(response.data);
                 formik.setValues({
@@ -98,12 +97,12 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                 if (err.response?.data.error != null)
                     console.log(err.response.data.error);
             });
-    }, [axios, id]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!appointment)
             return;
-        axios.get(`patients/${appointment.patientId}`)
+        authRequest.get(`patients/${appointment.patientId}`)
             .then((response: AxiosResponse<Patient>) => {
                 formik.setValues({
                     ...formik.values,
@@ -116,7 +115,7 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                 if (err.response?.data.error != null)
                     console.log(err.response.data.error);
             });
-    }, [appointment, axios]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [appointment]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6 mx-auto mt-8">

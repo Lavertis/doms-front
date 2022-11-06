@@ -6,8 +6,8 @@ import {Button} from "primereact/button";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import ConfirmationModal from "../../../../components/ConfirmationModal";
-import useAxios from "../../../../hooks/useAxios";
 import {AxiosError} from "axios";
+import {authRequest} from "../../../../services/api.service";
 
 interface PatientListProps {
     patients: Patient[];
@@ -20,9 +20,8 @@ interface PatientListProps {
 
 const PatientList = ({patients, loading, lazyParams, setLazyParams, totalRecords, allowDelete}: PatientListProps) => {
     const navigate = useNavigate();
-    const axios = useAxios();
     const deletePatient = (patientId: string) => {
-        axios.delete(`patients/${patientId}`)
+        authRequest.delete(`patients/${patientId}`)
             .then(() => {
                 setLazyParams({...lazyParams});
             })

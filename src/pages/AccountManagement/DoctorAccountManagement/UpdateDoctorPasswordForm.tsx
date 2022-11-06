@@ -1,10 +1,10 @@
 import {FC, useState} from 'react';
 import * as Yup from 'yup';
-import useAxios from '../../../hooks/useAxios';
 import {useFormik} from 'formik';
 import {Message} from 'primereact/message';
 import FormInput from '../../../components/Form/FormInput';
 import {Button} from 'primereact/button';
+import {authRequest} from "../../../services/api.service";
 
 const UpdateDoctorPasswordValidationSchema = Yup.object().shape({
     newPassword: Yup.string()
@@ -24,7 +24,6 @@ interface UpdateDoctorPasswordFormProps {
 const UpdateDoctorPasswordForm: FC<UpdateDoctorPasswordFormProps> = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const axios = useAxios();
 
     const formik = useFormik({
         initialValues: {
@@ -34,7 +33,7 @@ const UpdateDoctorPasswordForm: FC<UpdateDoctorPasswordFormProps> = () => {
         },
         validationSchema: UpdateDoctorPasswordValidationSchema,
         onSubmit: values => {
-            axios.patch('doctors/current', values)
+            authRequest.patch('doctors/current', values)
                 .then(() => {
                     setSuccess('Account information updated successfully');
                     setError('');

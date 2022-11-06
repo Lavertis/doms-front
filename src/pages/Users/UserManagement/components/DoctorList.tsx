@@ -6,8 +6,7 @@ import {LazyParams} from "../../../../types/data-table";
 import {Button} from "primereact/button";
 import {useNavigate} from "react-router-dom";
 import ConfirmationModal from "../../../../components/ConfirmationModal";
-import useAxios from "../../../../hooks/useAxios";
-import {AxiosError} from "axios";
+import {authRequest} from "../../../../services/api.service";
 
 
 interface DoctorListProps {
@@ -21,13 +20,12 @@ interface DoctorListProps {
 
 const DoctorList = ({doctors, loading, lazyParams, setLazyParams, totalRecords, allowDelete}: DoctorListProps) => {
     const navigate = useNavigate();
-    const axios = useAxios();
     const deleteDoctor = (doctorId: string) => {
-        axios.delete(`doctors/${doctorId}`)
+        authRequest.delete(`doctors/${doctorId}`)
             .then(() => {
                 setLazyParams({...lazyParams});
             })
-            .catch((err: AxiosError) => {
+            .catch(err => {
                 console.log(err);
             });
     };

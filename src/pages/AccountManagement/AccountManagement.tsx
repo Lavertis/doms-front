@@ -1,9 +1,9 @@
-import {FC, useContext} from 'react';
+import {FC} from 'react';
 import PatientAccountManagement from './PatientAccountManagement/PatientAccountManagement';
-import {TokenContext} from '../../App';
-import {getRoleFromToken} from '../../utils/jwt-utils';
 import DoctorAccountManagement from './DoctorAccountManagement/DoctorAccountManagement';
 import Forbidden403 from '../../components/Errors/Forbidden403';
+import userStore from "../../store/user-store";
+import {observer} from "mobx-react-lite";
 
 const getAccountManagementComponentByRole = (role: string) => {
     switch (role) {
@@ -20,13 +20,12 @@ interface AccountManagementProps {
 }
 
 const AccountManagement: FC<AccountManagementProps> = () => {
-    const {token} = useContext(TokenContext);
 
     return (
         <>
-            {getAccountManagementComponentByRole(getRoleFromToken(token)!)}
+            {getAccountManagementComponentByRole(userStore.user?.role!)}
         </>
     );
 };
 
-export default AccountManagement;
+export default observer(AccountManagement);

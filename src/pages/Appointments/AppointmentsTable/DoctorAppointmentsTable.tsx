@@ -1,8 +1,7 @@
-import {FC, useContext, useEffect, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 import {Appointment} from '../../../types/appointment';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column';
-import useAxios from '../../../hooks/useAxios';
 import {AxiosError, AxiosResponse} from 'axios';
 import {FilterMatchMode} from 'primereact/api';
 import {Dropdown} from 'primereact/dropdown';
@@ -11,8 +10,9 @@ import moment from 'moment';
 import {Calendar} from 'primereact/calendar';
 import {useNavigate} from 'react-router-dom';
 import {uuidToBase64} from '../../../utils/uuid-utils';
-import {TokenContext} from "../../../App";
-import {getClaimFromToken} from "../../../utils/jwt-utils";
+import {authRequest} from "../../../services/api.service";
+import {observer} from "mobx-react-lite";
+import userStore from "../../../store/user-store";
 
 interface DoctorAppointmentsTableProps {
 }
@@ -20,7 +20,6 @@ interface DoctorAppointmentsTableProps {
 const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const navigate = useNavigate();
-    const axios = useAxios();
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [loading, setLoading] = useState(false);
     const [lazyParams, setLazyParams] = useState({
@@ -33,7 +32,6 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
             'date': {value: null, matchMode: FilterMatchMode.EQUALS},
         }
     });
-    const {token} = useContext(TokenContext);
 
     const statuses = ['Rejected', 'Accepted', 'Pending', 'Cancelled', 'Completed']; // TODO temporary location
     const types = ['Checkup', 'Consultation']; // TODO temporary location
@@ -49,8 +47,7 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
             dateEnd: lazyParams.filters.date.value ? moment(lazyParams.filters.date.value[1]).toISOString(true) : null,
         };
 
-        const doctorId = getClaimFromToken(token, 'sub');
-        axios.get(`appointments/search?doctorId=${doctorId}`, {params: queryParams})
+        authRequest.get(`appointments/search?doctorId=${userStore.user?.id}`, {params: queryParams})
             .then((response: AxiosResponse) => {
                 setAppointments(response.data.records);
                 setTotalRecords(response.data.totalRecords);
@@ -62,7 +59,7 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
                 setLoading(false);
             }
         });
-    }, [axios, lazyParams, token]);
+    }, [lazyParams]);
 
     const dropdownItemTemplate = (option: any) => {
         return <>{option}</>;
@@ -159,4 +156,4 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
     );
 };
 
-export default DoctorAppointmentsTable;
+export default observer(DoctorAppointmentsTable);

@@ -1,13 +1,12 @@
-import {FC, useContext, useEffect, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 import * as Yup from 'yup';
-import {TokenContext} from '../../App';
 import {useNavigate} from 'react-router-dom';
-import useAxios from '../../hooks/useAxios';
 import {useFormik} from 'formik';
-import {AxiosResponse} from 'axios';
 import {Button} from 'primereact/button';
 import {Message} from 'primereact/message';
 import FormInput from '../../components/Form/FormInput';
+import userStore from "../../store/user-store";
+import {observer} from "mobx-react-lite";
 
 const LoginSchema = Yup.object().shape({
     login: Yup.string().required('login is required'),
@@ -20,9 +19,7 @@ interface LoginProps {
 
 const Login: FC<LoginProps> = ({redirectTo}) => {
     const [error, setError] = useState('');
-    const {token, setToken} = useContext(TokenContext);
     const navigate = useNavigate();
-    const axios = useAxios();
 
     const formik = useFormik({
         initialValues: {
@@ -30,25 +27,20 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
             password: ''
         },
         validationSchema: LoginSchema,
-        onSubmit: values => {
-            axios.post('auth/authenticate', values)
-                .then((response: AxiosResponse) => {
-                    setToken(response.data.jwtToken);
-                    localStorage.setItem('jwtToken', response.data.jwtToken);
-                    localStorage.setItem('refreshToken', response.data.refreshToken);
-                    navigate(redirectTo, {replace: true});
-                })
-                .catch(err => {
-                    setError(err.response?.data.error);
-                });
+        onSubmit: async values => {
+            const signInResult = await userStore.signIn(values);
+            if(signInResult)
+                navigate(redirectTo, {replace: true});
+            else
+                setError("Wrong credentials");
         },
     });
 
     useEffect(() => {
-        if (token) {
+        if (userStore.user != null) {
             navigate(redirectTo, {replace: true});
         }
-    }, [navigate, redirectTo, token]);
+    }, [navigate, redirectTo]);
 
     return (
         <div className="surface-card p-5 shadow-2 border-round w-11 sm:w-7 lg:w-5 xl:w-4 mx-auto mt-8">
@@ -81,4 +73,4 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
     );
 };
 
-export default Login;
+export default observer(Login);

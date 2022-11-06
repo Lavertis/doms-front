@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {Appointment} from "../../../../types/appointment";
-import useAxios from "../../../../hooks/useAxios";
 import {AxiosError, AxiosResponse} from "axios";
 import {Patient} from "../../../../types/patient";
 import {TabPanel, TabView} from 'primereact/tabview';
@@ -16,6 +15,7 @@ import {formatErrorsForFormik} from "../../../../utils/error-utils";
 import TextAreaWithMultipleChoiceButtons from "./TextAreaWithMultipleChoiceButtons";
 import PrescriptionsPanelContent from "./PrescriptionsPanelContent";
 import {Drug} from "../../../../types/drugs";
+import {authRequest} from "../../../../services/api.service";
 
 const AppointmentValidationSchema = Yup.object().shape({
     interview: Yup.string().required('Interview is required'),
@@ -30,7 +30,6 @@ interface AppointmentDetailsProps {
 }
 
 const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDetailsProps) => {
-    const axios = useAxios();
     const [appointment, setAppointment] = useState<Appointment>();
     const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
     const [patientAge, setPatientAge] = useState<number>(0);
@@ -50,7 +49,7 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
         validationSchema: AppointmentValidationSchema,
         onSubmit: values => {
             const newValues = {...values, status: 'Completed'}
-            axios.patch(`appointments/user/current/${appointment?.id}`, newValues)
+            authRequest.patch(`appointments/user/current/${appointment?.id}`, newValues)
                 .then((response: AxiosResponse<Appointment>) => {
                     setAppointment(response.data);
                 })
@@ -64,7 +63,7 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
     });
 
     useEffect(() => {
-        axios.get(`appointments/user/current/${appointmentId}`)
+        authRequest.get(`appointments/user/current/${appointmentId}`)
             .then((response: AxiosResponse<Appointment>) => {
                 const appointment = response.data;
                 setAppointment(appointment);
@@ -80,7 +79,7 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                     console.log(err.response.data.error);
             });
 
-        axios.get(`prescriptions/appointment/${appointmentId}`)
+        authRequest.get(`prescriptions/appointment/${appointmentId}`)
             .then(response => {
                 setPrescriptions(response.data.records)
             })
@@ -88,12 +87,12 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                 if (err.response?.data.error != null)
                     console.log(err.response.data.error);
             });
-    }, [axios, appointmentId]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [appointmentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!appointment)
             return;
-        axios.get(`patients/${appointment.patientId}`)
+        authRequest.get(`patients/${appointment.patientId}`)
             .then((response: AxiosResponse<Patient>) => {
                 const patient = response.data;
                 setPatient(patient);
@@ -103,7 +102,7 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                 if (err.response?.data.error != null)
                     console.log(err.response.data.error);
             });
-    }, [appointment, axios]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [appointment]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const getHeader = (header: string, fieldName: string) => {
         const isFormFieldValid = (name: string) =>

@@ -4,9 +4,9 @@ import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {Button} from "primereact/button";
 import {Prescription} from "../../types/prescription";
-import axios from "../../api/Axios";
 import moment from "moment";
 import ConfirmationModal from "../ConfirmationModal";
+import {authRequest} from "../../services/api.service";
 
 interface PrescriptionsProps {
     prescriptions: Prescription[],
@@ -18,7 +18,7 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
     const [currentPrescriptionId, setCurrentPrescriptionId] = useState('');
 
     const deletePrescription = (id: string) => {
-        axios.delete(`prescriptions/${id}`).then();
+        authRequest.delete(`prescriptions/${id}`).then();
         setPrescriptions(prescriptions.filter(prescription => prescription.id !== id));
     }
 

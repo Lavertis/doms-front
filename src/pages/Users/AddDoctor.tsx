@@ -4,10 +4,10 @@ import {classNames} from "primereact/utils";
 import {useFormik} from "formik";
 import {InputText} from "primereact/inputtext";
 import * as Yup from 'yup';
-import useAxios from "../../hooks/useAxios";
 import {useNavigate} from "react-router-dom";
 import {formatErrorsForFormik} from "../../utils/error-utils";
 import YupPassword from "yup-password";
+import {authRequest} from "../../services/api.service";
 
 YupPassword(Yup);
 const addDoctorValidationSchema = Yup.object().shape({
@@ -18,7 +18,6 @@ const addDoctorValidationSchema = Yup.object().shape({
 });
 
 const AddDoctor = () => {
-    const axios = useAxios();
     const navigate = useNavigate();
 
     const formik = useFormik({
@@ -31,7 +30,7 @@ const AddDoctor = () => {
         validationSchema: addDoctorValidationSchema,
         onSubmit: values => {
             console.log(values);
-            axios.post('doctors', values)
+            authRequest.post('doctors', values)
                 .then(() => {
                     navigate('/users', {replace: true});
                 })

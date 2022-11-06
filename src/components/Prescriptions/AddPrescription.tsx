@@ -6,7 +6,7 @@ import AddDrugItem from "./AddDrugItem";
 import {Drug} from "../../types/drugs";
 import {cartesian} from "../../utils/math-utils";
 import {Toast} from "primereact/toast";
-import useAxios from "../../hooks/useAxios";
+import {authRequest} from "../../services/api.service";
 
 interface AddPrescriptionProps {
     patientId: string,
@@ -17,7 +17,6 @@ interface AddPrescriptionProps {
 
 const AddPrescription = ({patientId, appointmentId, drugItems, setDrugItems}: AddPrescriptionProps) => {
     const dosages = cartesian([[0, 1, 2], [0, 1, 2], [0, 1, 2]]).slice(1).map(x => x.join('-'));
-    const axios = useAxios();
 
     const setDrug = (drug: Drug, index: number) => {
         const localDrugItems = drugItems;
@@ -37,8 +36,8 @@ const AddPrescription = ({patientId, appointmentId, drugItems, setDrugItems}: Ad
                 drugItems: drugItems,
                 fulfillmentDeadline: values.fulfillmentDeadline
             }
-            axios.post("prescriptions/doctor/current", data)
-                .then(response => {
+            authRequest.post("prescriptions/doctor/current", data)
+                .then(() => {
                     setDrugItems([]);
                 })
         },

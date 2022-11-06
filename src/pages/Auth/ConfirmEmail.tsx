@@ -1,8 +1,8 @@
 import React, {useRef} from 'react';
 import {useNavigate, useSearchParams} from "react-router-dom";
-import useAxios from "../../hooks/useAxios";
 import {Toast} from "primereact/toast";
 import {Button} from "primereact/button";
+import {authRequest} from "../../services/api.service";
 
 interface ConfirmEmailProps {
     redirectTo: string;
@@ -10,13 +10,12 @@ interface ConfirmEmailProps {
 
 const ConfirmEmail = ({redirectTo}: ConfirmEmailProps) => {
     const [searchParams] = useSearchParams();
-    const axios = useAxios();
     const navigate = useNavigate();
 
     const confirmEmail = () => {
         const token = searchParams.get('token');
         const email = searchParams.get('email');
-        axios.post('users/confirm-email', {token, email})
+        authRequest.post('users/confirm-email', {token, email})
             .then(_ => {
                 showToast('success', 'Email confirmed', 'Your email has been confirmed successfully');
                 setTimeout(() => {

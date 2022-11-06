@@ -2,10 +2,10 @@ import {FC, useEffect, useState} from 'react';
 import * as Yup from 'yup';
 import {AxiosResponse} from 'axios';
 import {useFormik} from 'formik';
-import useAxios from '../../../hooks/useAxios';
 import {Message} from 'primereact/message';
 import FormInput from '../../../components/Form/FormInput';
 import {Button} from 'primereact/button';
+import {authRequest} from "../../../services/api.service";
 
 const UpdateDoctorInfoValidationSchema = Yup.object().shape({
     email: Yup.string()
@@ -21,7 +21,6 @@ interface UpdateDoctorAccountInfoFormProps {
 const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const axios = useAxios();
 
     const formik = useFormik({
         initialValues: {
@@ -33,7 +32,7 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
         },
         validationSchema: UpdateDoctorInfoValidationSchema,
         onSubmit: values => {
-            axios.patch('doctors/current', values)
+            authRequest.patch('doctors/current', values)
                 .then(() => {
                     setSuccess('Account information updated successfully');
                     setError('');
@@ -54,7 +53,7 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
     });
 
     useEffect(() => {
-        axios.get('doctors/current')
+        authRequest.get('doctors/current')
             .then((response: AxiosResponse) => {
                 formik.setValues({
                     email: response.data.email,
@@ -68,7 +67,7 @@ const UpdateDoctorAccountInfoForm: FC<UpdateDoctorAccountInfoFormProps> = () => 
                 setError('Error getting user info');
                 setSuccess('');
             });
-    }, [axios]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div>

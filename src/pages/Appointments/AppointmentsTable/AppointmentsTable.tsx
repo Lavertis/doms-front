@@ -1,12 +1,10 @@
-import React, {useContext} from 'react';
-import {TokenContext} from "../../../App";
-import {getRoleFromToken} from "../../../utils/jwt-utils";
+import React from 'react';
 import DoctorAppointmentsTable from "./DoctorAppointmentsTable";
 import PatientAppointmentsTable from "./PatientAppointmentsTable";
+import userStore from "../../../store/user-store";
+import {observer} from "mobx-react-lite";
 
 const AppointmentsTable = () => {
-    const {token} = useContext(TokenContext);
-    const role = getRoleFromToken(token);
 
     const doctorAppointmentsTable = () => {
         return (<DoctorAppointmentsTable/>);
@@ -18,9 +16,9 @@ const AppointmentsTable = () => {
 
     return (
         <div className="col-11 xl:col-9 mx-auto">
-            {role === 'Doctor' ? doctorAppointmentsTable() : patientAppointmentsTable()}
+            {userStore.user?.role === 'Doctor' ? doctorAppointmentsTable() : patientAppointmentsTable()}
         </div>
     );
 };
 
-export default AppointmentsTable;
+export default observer(AppointmentsTable);

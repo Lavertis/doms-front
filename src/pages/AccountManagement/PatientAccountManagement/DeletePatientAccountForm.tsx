@@ -1,17 +1,16 @@
 import {FC, useState} from 'react';
-import useAxios from '../../../hooks/useAxios';
 import {useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import {Message} from 'primereact/message';
 import FormInput from '../../../components/Form/FormInput';
 import {Button} from 'primereact/button';
+import {authRequest} from "../../../services/api.service";
 
 interface DeletePatientAccountFormProps {
 }
 
 const DeletePatientAccountForm: FC<DeletePatientAccountFormProps> = () => {
     const [error, setError] = useState('');
-    const axios = useAxios();
     const navigate = useNavigate();
 
     const formik = useFormik({
@@ -20,7 +19,7 @@ const DeletePatientAccountForm: FC<DeletePatientAccountFormProps> = () => {
         },
         onSubmit: () => {
             // TODO add check for current password
-            axios.delete('patients/current')
+            authRequest.delete('patients/current')
                 .then(() => {
                     setError('');
                     navigate('/');

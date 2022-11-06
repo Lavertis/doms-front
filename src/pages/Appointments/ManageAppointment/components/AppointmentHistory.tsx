@@ -8,9 +8,9 @@ import {FilterMatchMode} from "primereact/api";
 import {Dropdown} from "primereact/dropdown";
 import {Calendar} from "primereact/calendar";
 import {AxiosError, AxiosResponse} from "axios";
-import useAxios from "../../../../hooks/useAxios";
 import {useNavigate} from "react-router-dom";
 import {uuidToBase64} from "../../../../utils/uuid-utils";
+import {authRequest} from "../../../../services/api.service";
 
 
 interface AppointmentHistoryProps {
@@ -21,7 +21,6 @@ const AppointmentHistory = ({patientId}: AppointmentHistoryProps) => {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [loading, setLoading] = useState(false);
-    const axios = useAxios();
     const navigate = useNavigate();
 
     const statuses = ['Rejected', 'Accepted', 'Pending', 'Cancelled', 'Completed']; // TODO temporary location
@@ -51,7 +50,7 @@ const AppointmentHistory = ({patientId}: AppointmentHistoryProps) => {
 
         if (patientId === undefined)
             return;
-        axios.get(`appointments/search?patientId=${patientId}&status=Completed`, {params: queryParams})
+        authRequest.get(`appointments/search?patientId=${patientId}&status=Completed`, {params: queryParams})
             .then((response: AxiosResponse) => {
                 setAppointments(response.data.records);
                 setTotalRecords(response.data.totalRecords);
@@ -63,7 +62,7 @@ const AppointmentHistory = ({patientId}: AppointmentHistoryProps) => {
                 setLoading(false);
             }
         });
-    }, [axios, lazyParams, patientId]);
+    }, [lazyParams, patientId]);
 
     const typeRowFilterTemplate = (options: any) => {
         return <Dropdown

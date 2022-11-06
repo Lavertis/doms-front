@@ -1,5 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
-import useAxios from "../../../hooks/useAxios";
+import React, {useEffect, useState} from 'react';
 import {TabPanel, TabView} from "primereact/tabview";
 import DoctorList from "./components/DoctorList";
 import PatientList from "./components/PatientList";
@@ -8,13 +7,11 @@ import {Doctor} from "../../../types/doctor";
 import {Patient} from "../../../types/patient";
 import {LazyParams} from "../../../types/data-table";
 import {AxiosError} from "axios";
-import {TokenContext} from "../../../App";
-import {getRoleFromToken} from "../../../utils/jwt-utils";
+import {authRequest} from "../../../services/api.service";
+import {observer} from "mobx-react-lite";
+import userStore from "../../../store/user-store";
 
 const UserManagement = () => {
-    const axios = useAxios();
-    const {token} = useContext(TokenContext);
-    const role = getRoleFromToken(token);
 
     const [doctorsLoading, setDoctorsLoading] = useState(false);
     const [patientsLoading, setPatientsLoading] = useState(false);
@@ -65,7 +62,7 @@ const UserManagement = () => {
             }
         });
 
-        axios.get('patients', {params: queryParams}).then(response => {
+        authRequest.get('patients', {params: queryParams}).then(response => {
             setPatients(response.data.records);
             setTotalPatientRecords(response.data.totalRecords);
             setPatientsLoading(false);
@@ -76,10 +73,10 @@ const UserManagement = () => {
                 setPatientsLoading(false);
             }
         });
-    }, [axios, patientListLazyParams]);
+    }, [patientListLazyParams]);
 
     useEffect(() => {
-        if (role !== 'Admin')
+        if (userStore.user?.role !== 'Admin')
             return;
 
         setDoctorsLoading(true);
@@ -97,7 +94,7 @@ const UserManagement = () => {
             }
         });
 
-        axios.get('doctors', {params: queryParams}).then(response => {
+        authRequest.get('doctors', {params: queryParams}).then(response => {
             setDoctors(response.data.records);
             setTotalDoctorRecords(response.data.totalRecords);
             setDoctorsLoading(false);
@@ -108,7 +105,7 @@ const UserManagement = () => {
                 setDoctorsLoading(false);
             }
         });
-    }, [axios, doctorListLazyParams, role]);
+    }, [doctorListLazyParams]);
 
     return (
         <div className="my-5 mx-auto col-11 xl:col-10">
@@ -120,17 +117,17 @@ const UserManagement = () => {
                         loading={patientsLoading}
                         lazyParams={patientListLazyParams}
                         setLazyParams={setPatientListLazyParams}
-                        allowDelete={role === 'Admin'}
+                        allowDelete={userStore.user?.role === 'Admin'}
                     />
                 </TabPanel>
-                {role === 'Admin' && <TabPanel header="Doctors">
+                {userStore.user?.role === 'Admin' && <TabPanel header="Doctors">
                     <DoctorList
                         doctors={doctors}
                         totalRecords={totalDoctorRecords}
                         loading={doctorsLoading}
                         lazyParams={doctorListLazyParams}
                         setLazyParams={setDoctorListLazyParams}
-                        allowDelete={role === 'Admin'}
+                        allowDelete={userStore.user?.role === 'Admin'}
                     />
                 </TabPanel>
                 }
@@ -139,4 +136,4 @@ const UserManagement = () => {
     );
 };
 
-export default UserManagement;
+export default observer(UserManagement);

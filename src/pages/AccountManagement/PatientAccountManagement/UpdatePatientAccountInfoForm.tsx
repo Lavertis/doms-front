@@ -1,5 +1,4 @@
 import React, {FC, useEffect, useState} from 'react';
-import useAxios from '../../../hooks/useAxios';
 import {useFormik} from 'formik';
 import {AxiosResponse} from 'axios';
 import * as Yup from 'yup';
@@ -7,6 +6,7 @@ import {Message} from 'primereact/message';
 import FormInput from '../../../components/Form/FormInput';
 import {Button} from 'primereact/button';
 import {formatErrorsForFormik} from "../../../utils/error-utils";
+import {authRequest} from "../../../services/api.service";
 
 const UpdatePatientInfoValidationSchema = Yup.object().shape({
     firstName: Yup.string()
@@ -34,7 +34,6 @@ interface UpdatePatientAccountInfoFormProps {
 const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const axios = useAxios();
 
     const formik = useFormik({
         initialValues: {
@@ -50,7 +49,7 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
         validationSchema: UpdatePatientInfoValidationSchema,
         onSubmit: values => {
             values.dateOfBirth = new Date(values.dateOfBirth).toISOString();
-            axios.patch('patients/current', values)
+            authRequest.patch('patients/current', values)
                 .then(() => {
                     setSuccess('Account information updated successfully');
                     setError('');
@@ -71,7 +70,7 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
     });
 
     useEffect(() => {
-        axios.get('patients/current')
+        authRequest.get('patients/current')
             .then((response: AxiosResponse) => {
                 formik.setValues({
                     firstName: response.data.firstName,
@@ -88,7 +87,7 @@ const UpdatePatientAccountInfoForm: FC<UpdatePatientAccountInfoFormProps> = () =
                 setError('Error getting user info');
                 setSuccess('');
             });
-    }, [axios]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div>

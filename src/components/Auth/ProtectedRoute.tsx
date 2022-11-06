@@ -1,27 +1,25 @@
-import {FC, useContext} from 'react';
-import {TokenContext} from '../../App';
+import {FC} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
-import {getRoleFromToken} from '../../utils/jwt-utils';
 import Forbidden403 from '../Errors/Forbidden403';
 import Login from '../../pages/Auth/Login';
+import userStore from "../../store/user-store";
+import {observer} from "mobx-react-lite";
 
 interface ProtectedRouteProps {
     allowedRoles: string[];
 }
 
 const ProtectedRoute: FC<ProtectedRouteProps> = ({allowedRoles}) => {
-    const {token} = useContext(TokenContext);
     const location = useLocation();
 
-    if (!token)
+    if (!userStore.user)
         return <Login redirectTo={location.pathname}/>;
 
-    const role = getRoleFromToken(token);
     return (
-        allowedRoles.includes(role!) ?
+        allowedRoles.includes(userStore.user?.role) ?
             <Outlet/> :
             <Forbidden403/>
     );
 };
 
-export default ProtectedRoute;
+export default observer(ProtectedRoute);

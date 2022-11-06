@@ -1,9 +1,7 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Appointment} from "../../../types/appointment";
 import {useNavigate} from "react-router-dom";
-import useAxios from "../../../hooks/useAxios";
 import {FilterMatchMode} from "primereact/api";
-import {TokenContext} from "../../../App";
 import moment from "moment/moment";
 import {AxiosError, AxiosResponse} from "axios";
 import {Dropdown} from "primereact/dropdown";
@@ -14,11 +12,12 @@ import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {AppointmentSearch} from "../../../types/appointment-search";
 import ConfirmationModal from "../../../components/ConfirmationModal";
+import {authRequest} from "../../../services/api.service";
 
 const PatientAppointmentsTable = () => {
     const [appointments, setAppointments] = useState<AppointmentSearch[]>([]);
     const navigate = useNavigate();
-    const axios = useAxios();
+
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [loading, setLoading] = useState(false);
     const [lazyParams, setLazyParams] = useState({
@@ -31,7 +30,6 @@ const PatientAppointmentsTable = () => {
             'date': {value: null, matchMode: FilterMatchMode.EQUALS},
         }
     });
-    const {token} = useContext(TokenContext);
 
     const statuses = ['Rejected', 'Accepted', 'Pending', 'Cancelled', 'Completed']; // TODO temporary location
     const types = ['Checkup', 'Consultation']; // TODO temporary location
@@ -43,7 +41,7 @@ const PatientAppointmentsTable = () => {
     const [currentAppointmentId, setCurrentAppointmentId] = useState('');
 
     const cancelAppointment = () => {
-        axios.patch(`appointments/user/current/${currentAppointmentId}`, {status: 'Cancelled'})
+        authRequest.patch(`appointments/user/current/${currentAppointmentId}`, {status: 'Cancelled'})
             .then(() => {
                 setLazyParams({...lazyParams});
             })
@@ -63,7 +61,7 @@ const PatientAppointmentsTable = () => {
             dateEnd: lazyParams.filters.date.value ? moment(lazyParams.filters.date.value[1]).toISOString(true) : null,
         };
 
-        axios.get(`appointments/patient/current/search`, {params: queryParams})
+        authRequest.get(`appointments/patient/current/search`, {params: queryParams})
             .then((response: AxiosResponse) => {
                 let appointments: AppointmentSearch[] = response.data.records;
                 appointments = appointments.map(appointment => {
@@ -82,7 +80,7 @@ const PatientAppointmentsTable = () => {
                 setLoading(false);
             }
         });
-    }, [axios, lazyParams, token]);
+    }, [lazyParams]);
 
     const dropdownItemTemplate = (option: any) => {
         return <>{option}</>;

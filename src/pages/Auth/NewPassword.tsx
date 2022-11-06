@@ -1,6 +1,5 @@
 import React, {useRef} from 'react';
 import {useNavigate, useSearchParams} from "react-router-dom";
-import useAxios from "../../hooks/useAxios";
 import {Toast} from "primereact/toast";
 import {Button} from "primereact/button";
 import {Password} from "primereact/password";
@@ -10,6 +9,7 @@ import {useFormik} from "formik";
 import * as Yup from "yup";
 import {Divider} from "primereact/divider";
 import YupPassword from "yup-password";
+import {authRequest} from "../../services/api.service";
 
 YupPassword(Yup);
 
@@ -24,13 +24,12 @@ interface NewPasswordProps {
 
 const NewPassword = ({redirectTo}: NewPasswordProps) => {
     const [searchParams] = useSearchParams();
-    const axios = useAxios();
     const navigate = useNavigate();
 
     const setNewPassword = (newPassword: string) => {
         const passwordResetToken = searchParams.get('token');
         const email = searchParams.get('email');
-        axios.post('users/password-reset/new', {passwordResetToken, email, newPassword})
+        authRequest.post('users/password-reset/new', {passwordResetToken, email, newPassword})
             .then(_ => {
                 showToast('success', 'Password reset', 'Your password has been reset successfully');
                 setTimeout(() => {

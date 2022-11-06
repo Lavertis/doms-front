@@ -1,15 +1,16 @@
-import React, {FC, useContext, useEffect, useRef, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import {Message} from 'primereact/message';
 import {Button} from 'primereact/button';
 import {useNavigate} from 'react-router-dom';
-import useAxios from '../../hooks/useAxios';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {TokenContext} from '../../App';
 import FormInput from '../../components/Form/FormInput';
 import YupPassword from "yup-password";
 import {formatErrorsForFormik} from "../../utils/error-utils";
 import {Toast, ToastSeverityType} from "primereact/toast";
+import {authRequest} from "../../services/api.service";
+import userStore from "../../store/user-store";
+import {observer} from "mobx-react-lite";
 
 YupPassword(Yup);
 
@@ -48,9 +49,7 @@ interface RegisterProps {
 
 const Register: FC<RegisterProps> = ({redirectTo}) => {
     const [error, setError] = useState('');
-    const {token} = useContext(TokenContext);
     const navigate = useNavigate();
-    const axios = useAxios();
 
     const formik = useFormik({
         initialValues: {
@@ -67,7 +66,7 @@ const Register: FC<RegisterProps> = ({redirectTo}) => {
         validationSchema: RegisterSchema,
         onSubmit: values => {
             values.dateOfBirth = new Date(values.dateOfBirth).toISOString();
-            axios.post('patients', values)
+            authRequest.post('patients', values)
                 .then(() => {
                     showToast('info', 'Account created', 'Go to your inbox and confirm your email.');
                     setTimeout(() => {
@@ -90,10 +89,10 @@ const Register: FC<RegisterProps> = ({redirectTo}) => {
     }
 
     useEffect(() => {
-        if (token) {
+        if (userStore.user) {
             navigate(redirectTo, {replace: true});
         }
-    }, [navigate, redirectTo, token]);
+    }, [navigate, redirectTo]);
 
     return (
         <div className="surface-card p-5 shadow-2 border-round w-full sm:w-7 lg:w-5 xl:w-4 mx-auto my-8">
@@ -127,4 +126,4 @@ const Register: FC<RegisterProps> = ({redirectTo}) => {
     );
 };
 
-export default Register;
+export default observer(Register);

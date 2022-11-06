@@ -1,7 +1,6 @@
-import {useContext, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import {Patient} from "../../../../types/patient";
-import useAxios from "../../../../hooks/useAxios";
 import PatientFields from "./components/PatientFields";
 import {Drug} from "../../../../types/drugs";
 import {Prescription} from "../../../../types/prescription";
@@ -9,35 +8,32 @@ import {AxiosError} from "axios";
 import {ErrorResult} from "../../../../types/error";
 import AddPrescription from "../../../../components/Prescriptions/AddPrescription";
 import Prescriptions from "../../../../components/Prescriptions/Prescriptions";
-import {getRoleFromToken} from "../../../../utils/jwt-utils";
-import {TokenContext} from "../../../../App";
 import {Fieldset} from 'primereact/fieldset';
+import {authRequest} from "../../../../services/api.service";
+import userStore from "../../../../store/user-store";
+import {observer} from "mobx-react-lite";
 
 const PatientDetails = () => {
     const {id} = useParams();
-    const axios = useAxios();
-    const {token} = useContext(TokenContext);
     const [patient, setPatient] = useState<Patient>();
 
     const [drugItems, setDrugItems] = useState<Drug[]>([]);
     const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
 
-    const role = getRoleFromToken(token);
-
     useEffect(() => {
-        axios.get(`/patients/${id}`)
+        authRequest.get(`/patients/${id}`)
             .then(response => {
                 setPatient(response.data);
             })
             .catch(error => {
                 console.log(error);
             });
-    }, [axios, id]);
+    }, [id]);
 
     useEffect(() => {
-        if (role !== "Doctor")
+        if (userStore.user?.role !== "Doctor")
             return;
-        axios.get(`prescriptions/patient/${id}`)
+        authRequest.get(`prescriptions/patient/${id}`)
             .then(response => {
                 setPrescriptions(response.data.records)
             })
@@ -45,7 +41,7 @@ const PatientDetails = () => {
                 if (err.response?.data.error != null)
                     console.log(err.response.data.error);
             });
-    }, [axios, id, role]);
+    }, [id]);
 
     return (
         <div className="col-11 lg:col-10 xl:col-8 mx-auto">
@@ -54,7 +50,7 @@ const PatientDetails = () => {
                     <PatientFields patient={patient}/>
                 </Fieldset>
 
-                {role === 'Doctor' && (
+                {userStore.user?.role === 'Doctor' && (
                     <>
                         <Fieldset legend="Prescriptions" toggleable collapsed className="mb-3">
                             <div>
@@ -94,4 +90,4 @@ const PatientDetails = () => {
     );
 };
 
-export default PatientDetails;
+export default observer(PatientDetails);

@@ -6,7 +6,7 @@ import {Button} from "primereact/button";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useNavigate} from "react-router-dom";
-import useAxios from "../../hooks/useAxios";
+import {authRequest} from "../../services/api.service";
 
 const passwordResetValidationSchema = Yup.object().shape({
     email: Yup.string().email().required('Required')
@@ -17,7 +17,6 @@ interface PasswordResetProps {
 }
 
 const PasswordReset = ({redirectTo}: PasswordResetProps) => {
-    const axios = useAxios();
     const navigate = useNavigate();
 
     const toast = useRef<Toast>(null);
@@ -32,7 +31,7 @@ const PasswordReset = ({redirectTo}: PasswordResetProps) => {
         },
         validationSchema: passwordResetValidationSchema,
         onSubmit: values => {
-            axios.post('users/password-reset', {email: values.email})
+            authRequest.post('users/password-reset', {email: values.email})
                 .then(_ => {
                     showToast('success', 'Password reset', 'A password reset link has been sent to your email');
                     setTimeout(() => {
