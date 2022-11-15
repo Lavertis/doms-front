@@ -1,4 +1,4 @@
-import {MultipleChoiceItem} from "../types/ui";
+import {MultipleChoiceItem} from "../types/quick-button";
 
 export const mockSymptoms: MultipleChoiceItem[] = [
     {id: "1", name: "Cough"},

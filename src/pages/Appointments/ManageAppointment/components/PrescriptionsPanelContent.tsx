@@ -3,6 +3,9 @@ import AddPrescription from "../../../../components/Prescriptions/AddPrescriptio
 import Prescriptions from "../../../../components/Prescriptions/Prescriptions";
 import {Prescription} from "../../../../types/prescription";
 import {Drug} from "../../../../types/drugs";
+import userStore from "../../../../store/user-store";
+import {observer} from "mobx-react-lite";
+import {Roles} from "../../../../enums/Roles";
 
 interface PrescriptionsPanelContentProps {
     appointmentId?: string;
@@ -11,6 +14,7 @@ interface PrescriptionsPanelContentProps {
     setPrescriptions: (prescriptions: Prescription[]) => void;
     drugItems: Drug[],
     setDrugItems: (drugItems: Drug[]) => void
+    fetchPrescriptions: () => void;
 }
 
 const PrescriptionsPanelContent = ({
@@ -19,20 +23,24 @@ const PrescriptionsPanelContent = ({
                                        prescriptions,
                                        setPrescriptions,
                                        drugItems,
-                                       setDrugItems
+                                       setDrugItems,
+                                       fetchPrescriptions
                                    }: PrescriptionsPanelContentProps) => {
 
     return (
         <div>
-            <div className="surface-card p-4 shadow-2 border-round w-full">
-                <AddPrescription
-                    patientId={patientId}
-                    appointmentId={appointmentId}
-                    drugItems={drugItems}
-                    setDrugItems={setDrugItems}
-                />
-            </div>
-            <div className="surface-card p-4 shadow-2 border-round w-full mt-5">
+            {userStore.user?.role === Roles.Doctor &&
+                <div className="p-4 shadow-1 border-round w-full mb-5">
+                    <AddPrescription
+                        patientId={patientId}
+                        appointmentId={appointmentId}
+                        drugItems={drugItems}
+                        setDrugItems={setDrugItems}
+                        fetchPrescriptions={fetchPrescriptions}
+                    />
+                </div>
+            }
+            <div className="p-4 shadow-1 border-round w-full">
                 <div className="text-center mb-5">
                     <div className="text-900 text-2xl font-medium mb-3">
                         Appointment prescriptions
@@ -45,4 +53,4 @@ const PrescriptionsPanelContent = ({
     );
 };
 
-export default PrescriptionsPanelContent;
+export default observer(PrescriptionsPanelContent);

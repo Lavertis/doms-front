@@ -11,6 +11,8 @@ import {AxiosError, AxiosResponse} from "axios";
 import {useNavigate} from "react-router-dom";
 import {uuidToBase64} from "../../../../utils/uuid-utils";
 import {authRequest} from "../../../../services/api.service";
+import {AppointmentTypes} from "../../../../enums/AppointmentTypes";
+import {AppointmentStatuses} from "../../../../enums/AppointmentStatuses";
 
 
 interface AppointmentHistoryProps {
@@ -23,8 +25,8 @@ const AppointmentHistory = ({patientId}: AppointmentHistoryProps) => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const statuses = ['Rejected', 'Accepted', 'Pending', 'Cancelled', 'Completed']; // TODO temporary location
-    const types = ['Checkup', 'Consultation']; // TODO temporary location
+    const statuses = [AppointmentStatuses.Rejected, AppointmentStatuses.Accepted, AppointmentStatuses.Pending, AppointmentStatuses.Cancelled, AppointmentStatuses.Completed]; // TODO temporary location
+    const types = [AppointmentTypes.Checkup, AppointmentTypes.Consultation]; // TODO temporary location
 
     const [lazyParams, setLazyParams] = useState({
         first: 0,

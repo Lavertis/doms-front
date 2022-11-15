@@ -9,7 +9,7 @@ import {useFormik} from "formik";
 import * as Yup from "yup";
 import {Divider} from "primereact/divider";
 import YupPassword from "yup-password";
-import {authRequest} from "../../services/api.service";
+import {request} from "../../services/api.service";
 
 YupPassword(Yup);
 
@@ -29,7 +29,7 @@ const NewPassword = ({redirectTo}: NewPasswordProps) => {
     const setNewPassword = (newPassword: string) => {
         const passwordResetToken = searchParams.get('token');
         const email = searchParams.get('email');
-        authRequest.post('users/password-reset/new', {passwordResetToken, email, newPassword})
+        request.post('users/password-reset/new', {passwordResetToken, email, newPassword})
             .then(_ => {
                 showToast('success', 'Password reset', 'Your password has been reset successfully');
                 setTimeout(() => {
@@ -80,7 +80,7 @@ const NewPassword = ({redirectTo}: NewPasswordProps) => {
     }
 
     return (
-        <div className="surface-card p-4 shadow-1 border-round w-full w-10 sm:w-8 lg:w-6 xl:w-4 mx-auto mt-8">
+        <div className="surface-card p-4 shadow-1 border-round w-full w-10 sm:w-8 lg:w-6 xl:w-5 mx-auto mt-8">
             <Toast ref={toast}/>
             <div className="text-center mb-5">
                 <div className="text-900 text-3xl font-medium mb-3">Password reset</div>

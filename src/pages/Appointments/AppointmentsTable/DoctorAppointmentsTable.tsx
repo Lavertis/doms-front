@@ -13,6 +13,8 @@ import {uuidToBase64} from '../../../utils/uuid-utils';
 import {authRequest} from "../../../services/api.service";
 import {observer} from "mobx-react-lite";
 import userStore from "../../../store/user-store";
+import {AppointmentTypes} from "../../../enums/AppointmentTypes";
+import {AppointmentStatuses} from "../../../enums/AppointmentStatuses";
 
 interface DoctorAppointmentsTableProps {
 }
@@ -33,8 +35,8 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
         }
     });
 
-    const statuses = ['Rejected', 'Accepted', 'Pending', 'Cancelled', 'Completed']; // TODO temporary location
-    const types = ['Checkup', 'Consultation']; // TODO temporary location
+    const statuses = [AppointmentStatuses.Rejected, AppointmentStatuses.Accepted, AppointmentStatuses.Pending, AppointmentStatuses.Cancelled, AppointmentStatuses.Completed]; // TODO temporary location
+    const types = [AppointmentTypes.Checkup, AppointmentTypes.Consultation]; // TODO temporary location
 
     useEffect(() => {
         setLoading(true);
@@ -111,10 +113,12 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
     const controlsTemplate = (rowData: Appointment) => {
         return <div className="flex justify-content-center">
             <Button onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}/edit`)} icon="pi pi-cog"/>
-            <Button className={'ml-1 ' + (rowData.status === 'Completed' ? "p-button-info" : "p-button-success")}
+            {rowData.status !== AppointmentStatuses.Pending && rowData.status !== AppointmentStatuses.Cancelled ?
+                <Button
+                    className={'ml-1 ' + (rowData.status === AppointmentStatuses.Completed ? "p-button-info" : "p-button-success")}
                     onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}`)}
-                    icon={'pi ' + (rowData.status === 'Completed' ? 'pi-eye' : 'pi-caret-right')}
-            />
+                    icon={'pi ' + (rowData.status === AppointmentStatuses.Completed ? 'pi-eye' : 'pi-caret-right')}
+                /> : null}
         </div>;
     };
 

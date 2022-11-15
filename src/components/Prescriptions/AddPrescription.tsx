@@ -13,9 +13,16 @@ interface AddPrescriptionProps {
     appointmentId?: string,
     drugItems: Drug[],
     setDrugItems: (drugItems: Drug[]) => void
+    fetchPrescriptions: () => void
 }
 
-const AddPrescription = ({patientId, appointmentId, drugItems, setDrugItems}: AddPrescriptionProps) => {
+const AddPrescription = ({
+                             patientId,
+                             appointmentId,
+                             drugItems,
+                             setDrugItems,
+                             fetchPrescriptions
+                         }: AddPrescriptionProps) => {
     const dosages = cartesian([[0, 1, 2], [0, 1, 2], [0, 1, 2]]).slice(1).map(x => x.join('-'));
 
     const setDrug = (drug: Drug, index: number) => {
@@ -28,30 +35,87 @@ const AddPrescription = ({patientId, appointmentId, drugItems, setDrugItems}: Ad
         initialValues: {
             fulfillmentDeadline: new Date()
         },
-        validationSchema: null,
         onSubmit: values => {
             const data = {
                 patientId: patientId,
                 appointmentId: appointmentId,
                 drugItems: drugItems,
-                fulfillmentDeadline: values.fulfillmentDeadline
+                fulfillmentDeadline: values.fulfillmentDeadline.toISOString()
+            }
+            if (values.fulfillmentDeadline < new Date(new Date().setDate(new Date().getDate() - 1))) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Prescription',
+                    detail: 'Fulfillment date cannot be in the past',
+                    life: 5000
+                });
+                return;
+            }
+
+            if (data.drugItems.length === 0) {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Prescription',
+                    detail: 'At least one drug item is required',
+                    life: 5000
+                });
+                return;
+            }
+
+            for (let i = 0; i < data.drugItems.length; i++) {
+                const drugItem = data.drugItems[i];
+                const idx = i + 1;
+                if (drugItem.rxcui === undefined) {
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Prescription',
+                        detail: `Drug item ${idx} has no drug selected`,
+                        life: 5000
+                    });
+                    return;
+                }
+                if (drugItem.quantity === 0) {
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Prescription',
+                        detail: `Drug quantity of the ${idx} drug item is required`,
+                        life: 5000
+                    });
+                    return;
+                }
+                if (drugItem.dosage === '') {
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Prescription',
+                        detail: `Drug dosage of the ${idx} drug item is required`,
+                        life: 5000
+                    });
+                    return;
+                }
             }
             authRequest.post("prescriptions/doctor/current", data)
                 .then(() => {
                     setDrugItems([]);
+                    fetchPrescriptions();
                 })
         },
     });
     const toast = useRef<Toast>(null);
 
-    const showError = (message: string) => {
-        if (toast.current)
-            (toast.current).show({severity: 'error', summary: 'Error Message', detail: message, life: 3000});
-    }
+    const isFormFieldValid = (name: string) => !!(formik.touched[name as keyof typeof formik.touched] && formik.errors[name as keyof typeof formik.errors]);
+    const getFormErrorMessage = (name: string) => {
+        return isFormFieldValid(name) &&
+            <small className="p-error">{formik.errors[name as keyof typeof formik.errors] as string}</small>;
+    };
 
     const addDrug = () => {
         if (drugItems.length === 5) {
-            showError('One prescription can have at most 5 drugs');
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Prescription',
+                detail: `One prescription can have at most 5 drugs`,
+                life: 5000
+            });
             return;
         }
         const newDrugItems = drugItems;
@@ -79,6 +143,7 @@ const AddPrescription = ({patientId, appointmentId, drugItems, setDrugItems}: Ad
             <div className="text-900 text-2xl font-medium text-black-alpha-80 text-center mb-3">
                 New prescription
             </div>
+            <hr/>
             <form onSubmit={formik.handleSubmit} className="flex flex-column">
                 <div className="col-12 md:col-6 pl-0 mb-3">
                     <label htmlFor="fulfillmentDeadline" className="block text-900 font-medium mb-2">
@@ -92,6 +157,7 @@ const AddPrescription = ({patientId, appointmentId, drugItems, setDrugItems}: Ad
                         onChange={formik.handleChange}
                         showIcon
                     />
+                    <div>{getFormErrorMessage('fulfillmentDeadline')}</div>
                 </div>
 
                 {drugItems.map((drugItem, index) =>

@@ -8,14 +8,16 @@ interface DoctorAccountManagementProps {
 
 const DoctorAccountManagement: FC<DoctorAccountManagementProps> = () => {
     return (
-        <TabView className="w-6 mx-auto my-5">
-            <TabPanel header="Update account">
-                <UpdateDoctorAccountInfoForm/>
-            </TabPanel>
-            <TabPanel header="Update password">
-                <UpdateDoctorPasswordForm/>
-            </TabPanel>
-        </TabView>
+        <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6 mx-auto mt-5">
+            <TabView className="">
+                <TabPanel header="Update account">
+                    <UpdateDoctorAccountInfoForm/>
+                </TabPanel>
+                <TabPanel header="Update password">
+                    <UpdateDoctorPasswordForm/>
+                </TabPanel>
+            </TabView>
+        </div>
     );
 };
 

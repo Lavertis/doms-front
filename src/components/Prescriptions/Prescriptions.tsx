@@ -7,6 +7,9 @@ import {Prescription} from "../../types/prescription";
 import moment from "moment";
 import ConfirmationModal from "../ConfirmationModal";
 import {authRequest} from "../../services/api.service";
+import userStore from "../../store/user-store";
+import {observer} from "mobx-react-lite";
+import {Roles} from "../../enums/Roles";
 
 interface PrescriptionsProps {
     prescriptions: Prescription[],
@@ -18,35 +21,39 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
     const [currentPrescriptionId, setCurrentPrescriptionId] = useState('');
 
     const deletePrescription = (id: string) => {
-        authRequest.delete(`prescriptions/${id}`).then();
-        setPrescriptions(prescriptions.filter(prescription => prescription.id !== id));
+        authRequest.delete(`prescriptions/${id}`).then(() => {
+            setPrescriptions(prescriptions.filter(prescription => prescription.id !== id));
+        });
     }
 
     if (prescriptions.length === 0) {
-        return <div>No prescriptions</div>
+        return <div className="text-center">No prescriptions</div>
     }
 
     return (
         <div>
             <Accordion>
                 {prescriptions.map((prescription, idx) =>
-                    <AccordionTab header={moment(prescription?.createdAt).toString()} key={prescription.id}
+                    <AccordionTab header={moment(prescription.createdAt).format('Do MMMM YYYY, HH:mm:ss')}
+                                  key={prescription.id}
                                   tabIndex={idx}>
                         <div className="flex justify-content-between align-items-center mb-3">
                             <div>
                                 <span className="font-bold">Fulfillment date: </span>
-                                {moment(prescription?.fulfilmentDate).toString()}
+                                {moment(prescription.fulfillmentDeadline).format('Do MMMM YYYY, HH:mm:ss')}
                             </div>
                             <div>
-                                <Button
-                                    icon="pi pi-times"
-                                    className="p-button-rounded p-button-danger"
-                                    aria-label="Cancel"
-                                    onClick={() => {
-                                        setCurrentPrescriptionId(prescription.id);
-                                        setModalIsShown(true)
-                                    }}
-                                />
+                                {userStore.user?.role === Roles.Doctor &&
+                                    <Button
+                                        icon="pi pi-times"
+                                        className="p-button-rounded p-button-danger"
+                                        aria-label="Cancel"
+                                        onClick={() => {
+                                            setCurrentPrescriptionId(prescription.id);
+                                            setModalIsShown(true)
+                                        }}
+                                    />
+                                }
                             </div>
                         </div>
 
@@ -69,4 +76,4 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
     );
 };
 
-export default Prescriptions;
+export default observer(Prescriptions);

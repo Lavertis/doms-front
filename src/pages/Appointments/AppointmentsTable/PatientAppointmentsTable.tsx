@@ -13,6 +13,10 @@ import {Column} from "primereact/column";
 import {AppointmentSearch} from "../../../types/appointment-search";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import {authRequest} from "../../../services/api.service";
+import {observer} from "mobx-react-lite";
+import {Roles} from "../../../enums/Roles";
+import {AppointmentTypes} from "../../../enums/AppointmentTypes";
+import {AppointmentStatuses} from "../../../enums/AppointmentStatuses";
 
 const PatientAppointmentsTable = () => {
     const [appointments, setAppointments] = useState<AppointmentSearch[]>([]);
@@ -31,8 +35,8 @@ const PatientAppointmentsTable = () => {
         }
     });
 
-    const statuses = ['Rejected', 'Accepted', 'Pending', 'Cancelled', 'Completed']; // TODO temporary location
-    const types = ['Checkup', 'Consultation']; // TODO temporary location
+    const statuses = [AppointmentStatuses.Rejected, AppointmentStatuses.Accepted, AppointmentStatuses.Pending, AppointmentStatuses.Cancelled, AppointmentStatuses.Completed]; // TODO temporary location
+    const types = [AppointmentTypes.Checkup, AppointmentTypes.Consultation]; // TODO temporary location
 
     const [modalIsShown, setModalIsShown] = useState(false);
     const hideModal = () => setModalIsShown(false);
@@ -41,7 +45,7 @@ const PatientAppointmentsTable = () => {
     const [currentAppointmentId, setCurrentAppointmentId] = useState('');
 
     const cancelAppointment = () => {
-        authRequest.patch(`appointments/user/current/${currentAppointmentId}`, {status: 'Cancelled'})
+        authRequest.patch(`appointments/user/current/${currentAppointmentId}`, {status: AppointmentStatuses.Cancelled})
             .then(() => {
                 setLazyParams({...lazyParams});
             })
@@ -130,17 +134,17 @@ const PatientAppointmentsTable = () => {
     };
 
     const controlsTemplate = (rowData: Appointment) => {
-        const cancelButton = () => <Button label="Cancel" icon="pi pi-times" className="p-button-danger"
+        const cancelButton = () => <Button label="" icon="pi pi-ban" className="p-button-danger"
                                            onClick={() => {
                                                setCurrentAppointmentId(rowData.id);
                                                showModal();
                                            }}/>;
-        const viewButton = () => <Button label="View" icon="pi pi-eye" className="p-button"
+        const viewButton = () => <Button label="" icon="pi pi-eye" className="p-button"
                                          onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}`)}/>;
 
         return <div className="flex justify-content-center">
-            {rowData.status !== "Completed" && rowData.status !== "Cancelled" && cancelButton()}
-            {rowData.status === "Completed" && viewButton()}
+            {rowData.status !== AppointmentStatuses.Completed && rowData.status !== AppointmentStatuses.Cancelled && cancelButton()}
+            {rowData.status === AppointmentStatuses.Completed && viewButton()}
         </div>;
     };
 
@@ -168,7 +172,7 @@ const PatientAppointmentsTable = () => {
                 responsiveLayout="scroll"
                 className="my-8"
             >
-                <Column field="doctorName" header="Doctor"/>
+                <Column field="doctorName" header={Roles.Doctor}/>
                 <Column field="date" header="Date" filter filterElement={dateRowFilterTemplate}
                         showFilterMatchModes={false}
                         body={dateTemplate}/>
@@ -190,4 +194,4 @@ const PatientAppointmentsTable = () => {
     );
 };
 
-export default PatientAppointmentsTable;
+export default observer(PatientAppointmentsTable);

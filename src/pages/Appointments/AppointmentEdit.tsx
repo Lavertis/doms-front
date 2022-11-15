@@ -1,4 +1,4 @@
-import {FC, useEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {uuidFromBase64, uuidToBase64} from '../../utils/uuid-utils';
 import {Appointment} from '../../types/appointment';
 import {AxiosError, AxiosResponse} from 'axios';
@@ -15,6 +15,7 @@ import {Calendar} from 'primereact/calendar';
 import {formatErrorsForFormik} from "../../utils/error-utils";
 import {ErrorResult} from "../../types/error";
 import {authRequest} from "../../services/api.service";
+import {AppointmentStatuses} from "../../enums/AppointmentStatuses";
 
 interface AppointmentPageProps {
 }
@@ -23,7 +24,7 @@ interface AppointmentPageProps {
 const UpdateAppointmentSchema = Yup.object().shape({
     description: Yup.string(),
     status: Yup.string()
-        .oneOf(['Pending', 'Accepted', 'Cancelled', 'Rejected', 'Completed'], 'Invalid status'),
+        .oneOf([AppointmentStatuses.Pending, AppointmentStatuses.Accepted, AppointmentStatuses.Cancelled, AppointmentStatuses.Rejected, AppointmentStatuses.Completed], 'Invalid status'),
 });
 
 const AppointmentEdit: FC<AppointmentPageProps> = () => {
@@ -45,14 +46,6 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
         validationSchema: UpdateAppointmentSchema,
         onSubmit: values => {
             let appointmentDate = moment(values.date + ' ' + moment(values.time).format('HH:mm')); // TODO merge this into single date
-            if (appointmentDate.clone().startOf('day').isBefore(moment().startOf('day'))) {
-                formik.setFieldError('date', 'Selected date must be in the future');
-                return;
-            }
-            if (appointmentDate.isBefore(moment())) {
-                formik.setFieldError('time', 'Selected time must be in the future');
-                return;
-            }
             const requestBody = {
                 date: appointmentDate.toISOString(),
                 description: values.description,
@@ -117,6 +110,12 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
             });
     }, [appointment]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const isFormFieldValid = (name: string) => !!(formik.touched[name as keyof typeof formik.touched] && formik.errors[name as keyof typeof formik.errors]);
+    const getFormErrorMessage = (name: string) => {
+        return isFormFieldValid(name) &&
+            <small className="p-error">{formik.errors[name as keyof typeof formik.errors] as string}</small>;
+    };
+
     return (
         <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6 mx-auto mt-8">
             <div className="text-center mb-5">
@@ -135,7 +134,7 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                 <FormInput formik={formik} id="address" label="Patient address" disabled/>
                 <div className="grid p-fluid">
                     <div className="col-12 md:col-6">
-                        <label htmlFor={id} className="block text-900 font-medium mb-2">Date</label>
+                        <label htmlFor="date" className="block text-900 font-medium mb-2">Date</label>
                         <Calendar
                             id="date"
                             dateFormat="dd/mm/yy"
@@ -144,9 +143,10 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                             onChange={formik.handleChange}
                             showIcon
                         />
+                        {getFormErrorMessage("date")}
                     </div>
                     <div className="col-12 md:col-6">
-                        <label htmlFor={id} className="block text-900 font-medium mb-2">Time</label>
+                        <label htmlFor="time" className="block text-900 font-medium mb-2">Time</label>
                         <Calendar
                             id="time"
                             value={formik.values.time}
@@ -156,6 +156,7 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                             icon={'pi pi-clock'}
                             timeOnly
                         />
+                        {getFormErrorMessage("time")}
                     </div>
                 </div>
                 <div className="mb-3 w-full">
@@ -173,22 +174,22 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                         <label htmlFor="status" className="block text-900 font-medium mb-2">Status</label>
                         <div className="p-inputgroup">
                             <InputText id="status" disabled value={formik.values.status}/>
-                            {['Pending'].includes(formik.values.status) &&
+                            {([AppointmentStatuses.Pending] as string[]).includes(formik.values.status) &&
                                 <Button
                                     icon="pi pi-check"
                                     className="p-button-success"
                                     onClick={() => {
-                                        formik.setFieldValue('status', 'Accepted');
+                                        formik.setFieldValue('status', AppointmentStatuses.Accepted);
                                     }}
                                 />
                             }
-                            {['Pending', 'Accepted'].includes(formik.values.status) &&
+                            {([AppointmentStatuses.Pending, AppointmentStatuses.Accepted] as string[]).includes(formik.values.status) &&
                                 <Button
                                     icon="pi pi-times"
                                     className="p-button-danger"
                                     onClick={() => {
-                                        formik.values.status === 'Pending' && formik.setFieldValue('status', 'Rejected');
-                                        formik.values.status === 'Accepted' && formik.setFieldValue('status', 'Cancelled');
+                                        formik.values.status === AppointmentStatuses.Pending && formik.setFieldValue('status', AppointmentStatuses.Rejected);
+                                        formik.values.status === AppointmentStatuses.Accepted && formik.setFieldValue('status', AppointmentStatuses.Cancelled);
                                     }}
                                 />
                             }
@@ -206,7 +207,8 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                     </div>
                     <div className="col-12 md:col-6">
                         <Button label="Start appointment" icon="pi pi-caret-right" type="submit"
-                                className="w-full p-button-success" disabled={appointment?.status !== 'Accepted'}
+                                className="w-full p-button-success"
+                                disabled={appointment?.status !== AppointmentStatuses.Accepted}
                                 onClick={() => navigate(`/appointments/${uuidToBase64(appointment.id)}`)}
                         />
                     </div>

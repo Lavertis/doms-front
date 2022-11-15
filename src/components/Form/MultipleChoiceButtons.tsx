@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button} from "primereact/button";
-import {MultipleChoiceItem} from "../../types/ui";
+import {MultipleChoiceItem} from "../../types/quick-button";
 
 interface MultipleChoiceButtonsProps {
     availableValues: MultipleChoiceItem[],

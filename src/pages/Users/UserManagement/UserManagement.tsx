@@ -10,6 +10,7 @@ import {AxiosError} from "axios";
 import {authRequest} from "../../../services/api.service";
 import {observer} from "mobx-react-lite";
 import userStore from "../../../store/user-store";
+import {Roles} from "../../../enums/Roles";
 
 const UserManagement = () => {
 
@@ -76,7 +77,7 @@ const UserManagement = () => {
     }, [patientListLazyParams]);
 
     useEffect(() => {
-        if (userStore.user?.role !== 'Admin')
+        if (userStore.user?.role !== Roles.Admin)
             return;
 
         setDoctorsLoading(true);
@@ -117,17 +118,17 @@ const UserManagement = () => {
                         loading={patientsLoading}
                         lazyParams={patientListLazyParams}
                         setLazyParams={setPatientListLazyParams}
-                        allowDelete={userStore.user?.role === 'Admin'}
+                        allowDelete={userStore.user?.role === Roles.Admin}
                     />
                 </TabPanel>
-                {userStore.user?.role === 'Admin' && <TabPanel header="Doctors">
+                {userStore.user?.role === Roles.Admin && <TabPanel header="Doctors">
                     <DoctorList
                         doctors={doctors}
                         totalRecords={totalDoctorRecords}
                         loading={doctorsLoading}
                         lazyParams={doctorListLazyParams}
                         setLazyParams={setDoctorListLazyParams}
-                        allowDelete={userStore.user?.role === 'Admin'}
+                        allowDelete={userStore.user?.role === Roles.Admin}
                     />
                 </TabPanel>
                 }

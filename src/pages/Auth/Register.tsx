@@ -8,7 +8,7 @@ import FormInput from '../../components/Form/FormInput';
 import YupPassword from "yup-password";
 import {formatErrorsForFormik} from "../../utils/error-utils";
 import {Toast, ToastSeverityType} from "primereact/toast";
-import {authRequest} from "../../services/api.service";
+import {request} from "../../services/api.service";
 import userStore from "../../store/user-store";
 import {observer} from "mobx-react-lite";
 
@@ -66,7 +66,7 @@ const Register: FC<RegisterProps> = ({redirectTo}) => {
         validationSchema: RegisterSchema,
         onSubmit: values => {
             values.dateOfBirth = new Date(values.dateOfBirth).toISOString();
-            authRequest.post('patients', values)
+            request.post('patients', values)
                 .then(() => {
                     showToast('info', 'Account created', 'Go to your inbox and confirm your email.');
                     setTimeout(() => {

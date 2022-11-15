@@ -8,14 +8,17 @@ import moment from "moment";
 import {Button} from "primereact/button";
 import {useFormik} from "formik";
 import * as Yup from "yup";
-import {MultipleChoiceItem} from "../../../../types/ui";
-import {mockDiseases, mockRecommendations, mockSymptoms} from "../../../../mock-data/appointment";
+import {MultipleChoiceItem, QuickButton} from "../../../../types/quick-button";
 import {ErrorResult} from "../../../../types/error";
 import {formatErrorsForFormik} from "../../../../utils/error-utils";
 import TextAreaWithMultipleChoiceButtons from "./TextAreaWithMultipleChoiceButtons";
 import PrescriptionsPanelContent from "./PrescriptionsPanelContent";
 import {Drug} from "../../../../types/drugs";
 import {authRequest} from "../../../../services/api.service";
+import userStore from "../../../../store/user-store";
+import {observer} from "mobx-react-lite";
+import {Roles} from "../../../../enums/Roles";
+import {AppointmentStatuses} from "../../../../enums/AppointmentStatuses";
 
 const AppointmentValidationSchema = Yup.object().shape({
     interview: Yup.string().required('Interview is required'),
@@ -38,6 +41,10 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
     const [diseases, setDiseases] = useState<MultipleChoiceItem[]>([]);
     const [recommendations, setRecommendations] = useState<MultipleChoiceItem[]>([]);
 
+    const [availableSymptoms, setAvailableSymptoms] = useState<MultipleChoiceItem[]>([]);
+    const [availableDiseases, setAvailableDiseases] = useState<MultipleChoiceItem[]>([]);
+    const [availableRecommendations, setAvailableRecommendations] = useState<MultipleChoiceItem[]>([]);
+
     const [drugItems, setDrugItems] = useState<Drug[]>([]);
 
     const formik = useFormik({
@@ -48,7 +55,7 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
         },
         validationSchema: AppointmentValidationSchema,
         onSubmit: values => {
-            const newValues = {...values, status: 'Completed'}
+            const newValues = {...values, status: AppointmentStatuses.Completed}
             authRequest.patch(`appointments/user/current/${appointment?.id}`, newValues)
                 .then((response: AxiosResponse<Appointment>) => {
                     setAppointment(response.data);
@@ -61,6 +68,38 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                 });
         },
     });
+
+    const fetchPrescriptions = () => {
+        const url = userStore.user?.role === Roles.Doctor ?
+            `prescriptions/appointment/${appointmentId}` : `prescriptions/patient/current/appointment/${appointmentId}`;
+
+        authRequest.get(url)
+            .then(response => {
+                setPrescriptions(response.data.records)
+            })
+            .catch((err: AxiosError<ErrorResult>) => {
+                if (err.response?.data.error != null)
+                    console.log(err.response.data.error);
+            });
+    }
+
+    useEffect(() => {
+        const mapQuickButtonToMultipleChoiceItem = (quickButton: QuickButton) => ({
+            id: quickButton.id,
+            name: quickButton.value
+        })
+        authRequest.get(`quick-buttons/doctor/current`)
+            .then(response => {
+                const data = response.data;
+                setAvailableSymptoms(data.interviewQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
+                setAvailableDiseases(data.diagnosisQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
+                setAvailableRecommendations(data.recommendationsQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
+            })
+            .catch((err: AxiosError<ErrorResult>) => {
+                if (err.response?.data.error != null)
+                    console.log(err.response.data.error);
+            });
+    }, []);
 
     useEffect(() => {
         authRequest.get(`appointments/user/current/${appointmentId}`)
@@ -79,20 +118,14 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                     console.log(err.response.data.error);
             });
 
-        authRequest.get(`prescriptions/appointment/${appointmentId}`)
-            .then(response => {
-                setPrescriptions(response.data.records)
-            })
-            .catch((err: AxiosError<ErrorResult>) => {
-                if (err.response?.data.error != null)
-                    console.log(err.response.data.error);
-            });
+        fetchPrescriptions();
     }, [appointmentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!appointment)
             return;
-        authRequest.get(`patients/${appointment.patientId}`)
+        const url = userStore.user?.role === Roles.Doctor ? `patients/${appointment.patientId}` : 'patients/current';
+        authRequest.get(url)
             .then((response: AxiosResponse<Patient>) => {
                 const patient = response.data;
                 setPatient(patient);
@@ -143,12 +176,14 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                     </div>
                 </div>
                 <div>
-                    <form onSubmit={formik.handleSubmit} noValidate>
-                        {appointment && appointment?.status !== 'Completed' ?
-                            <Button label="Save and complete" type="submit"></Button> :
-                            <Button label="Completed" type="button" disabled></Button>
-                        }
-                    </form>
+                    {userStore.user?.role === Roles.Doctor &&
+                        <form onSubmit={formik.handleSubmit} noValidate>
+                            {appointment && appointment?.status !== AppointmentStatuses.Completed ?
+                                <Button label="Save and complete" type="submit"></Button> :
+                                <Button label={AppointmentStatuses.Completed} type="button" disabled></Button>
+                            }
+                        </form>
+                    }
                 </div>
             </div>
 
@@ -156,36 +191,36 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                 <TabPanel header={getHeader('Interview', 'interview')} leftIcon="pi pi-calendar">
                     <TextAreaWithMultipleChoiceButtons
                         formik={formik}
-                        availableValues={mockSymptoms}
+                        availableValues={availableSymptoms}
                         selectedValues={symptoms}
                         setSelectedValues={setSymptoms}
                         fieldName={'interview'}
                         fieldPlaceholder={"Interview with patient"}
-                        disabled={appointment?.status === 'Completed'}
+                        disabled={appointment?.status === AppointmentStatuses.Completed}
                     />
                 </TabPanel>
 
                 <TabPanel header={getHeader('Diagnosis', 'diagnosis')} leftIcon="pi pi-user">
                     <TextAreaWithMultipleChoiceButtons
                         formik={formik}
-                        availableValues={mockDiseases}
+                        availableValues={availableDiseases}
                         selectedValues={diseases}
                         setSelectedValues={setDiseases}
                         fieldName={'diagnosis'}
                         fieldPlaceholder={"Diagnosed disease(s)"}
-                        disabled={appointment?.status === 'Completed'}
+                        disabled={appointment?.status === AppointmentStatuses.Completed}
                     />
                 </TabPanel>
 
                 <TabPanel header={getHeader('Recommendations', 'recommendations')} leftIcon="pi pi-search">
                     <TextAreaWithMultipleChoiceButtons
                         formik={formik}
-                        availableValues={mockRecommendations}
+                        availableValues={availableRecommendations}
                         selectedValues={recommendations}
                         setSelectedValues={setRecommendations}
                         fieldName={'recommendations'}
                         fieldPlaceholder={"Recommended treatment"}
-                        disabled={appointment?.status === 'Completed'}
+                        disabled={appointment?.status === AppointmentStatuses.Completed}
                     />
                 </TabPanel>
 
@@ -197,6 +232,7 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                         setPrescriptions={setPrescriptions}
                         drugItems={drugItems}
                         setDrugItems={setDrugItems}
+                        fetchPrescriptions={fetchPrescriptions}
                     />
                 </TabPanel>
             </TabView>
@@ -204,4 +240,4 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
     );
 };
 
-export default AppointmentDetails;
+export default observer(AppointmentDetails);

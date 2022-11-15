@@ -4,12 +4,13 @@ import DoctorAccountManagement from './DoctorAccountManagement/DoctorAccountMana
 import Forbidden403 from '../../components/Errors/Forbidden403';
 import userStore from "../../store/user-store";
 import {observer} from "mobx-react-lite";
+import {Roles} from "../../enums/Roles";
 
 const getAccountManagementComponentByRole = (role: string) => {
     switch (role) {
-        case 'Patient':
+        case Roles.Patient:
             return <PatientAccountManagement/>;
-        case 'Doctor':
+        case Roles.Doctor:
             return <DoctorAccountManagement/>;
         default:
             return <Forbidden403/>;

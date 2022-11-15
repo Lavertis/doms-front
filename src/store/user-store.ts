@@ -7,11 +7,11 @@ import {signIn, SignInRequest} from "../api/auth.api";
 import {request} from "../services/api.service";
 
 class UserStore {
+    user: IUser | null = null;
+
     constructor() {
         makeObservable(this, {user: observable, getUserData: action});
     }
-
-    user: IUser | null = null;
 
     async getUserData(jwtToken: string) {
         if (!!jwtToken) {
@@ -36,7 +36,7 @@ class UserStore {
     }
 
     async refreshToken() {
-        request.post("auth/refresh-token", {}, {withCredentials: true})
+        return request.post("auth/refresh-token", {}, {withCredentials: true})
             .then(async response => {
                 const jwtToken = response.data.jwtToken;
                 await this.getUserData(jwtToken);

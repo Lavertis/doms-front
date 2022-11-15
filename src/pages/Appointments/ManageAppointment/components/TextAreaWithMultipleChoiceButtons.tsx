@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {InputTextarea} from "primereact/inputtextarea";
 import MultipleChoiceButtons from "../../../../components/Form/MultipleChoiceButtons";
-import {MultipleChoiceItem} from "../../../../types/ui";
+import {MultipleChoiceItem} from "../../../../types/quick-button";
 
 interface TextAreaWithMultipleChoiceButtonsProps {
     formik: any;
@@ -68,18 +68,21 @@ const TextAreaWithMultipleChoiceButtons = ({
                         cols={60}
                         className="w-full h-full"
                         disabled={selectedValues.length > 0 || disabled}
+                        autoResize
                     />
                 </div>
                 {getFormErrorMessage(fieldName)}
             </div>
-            <div className="lg:col-6 lg:pl-4 mt-4 lg:mt-0">
-                <MultipleChoiceButtons
-                    availableValues={availableValues}
-                    selectedValues={selectedValues}
-                    setValues={setSelectedValues}
-                    disabled={disabled}
-                />
-            </div>
+            {!disabled &&
+                <div className="lg:col-6 lg:pl-4 mt-4 lg:mt-0">
+                    <MultipleChoiceButtons
+                        availableValues={availableValues}
+                        selectedValues={selectedValues}
+                        setValues={setSelectedValues}
+                        disabled={disabled}
+                    />
+                </div>
+            }
         </div>
     );
 };

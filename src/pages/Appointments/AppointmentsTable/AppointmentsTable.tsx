@@ -3,6 +3,7 @@ import DoctorAppointmentsTable from "./DoctorAppointmentsTable";
 import PatientAppointmentsTable from "./PatientAppointmentsTable";
 import userStore from "../../../store/user-store";
 import {observer} from "mobx-react-lite";
+import {Roles} from "../../../enums/Roles";
 
 const AppointmentsTable = () => {
 
@@ -16,7 +17,7 @@ const AppointmentsTable = () => {
 
     return (
         <div className="col-11 xl:col-9 mx-auto">
-            {userStore.user?.role === 'Doctor' ? doctorAppointmentsTable() : patientAppointmentsTable()}
+            {userStore.user?.role === Roles.Doctor ? doctorAppointmentsTable() : patientAppointmentsTable()}
         </div>
     );
 };

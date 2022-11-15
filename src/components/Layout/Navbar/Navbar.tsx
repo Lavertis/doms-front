@@ -3,6 +3,7 @@ import {Menubar} from 'primereact/menubar';
 import {useNavigate} from 'react-router-dom';
 import userStore from "../../../store/user-store";
 import {observer} from "mobx-react-lite";
+import {Roles} from "../../../enums/Roles";
 
 interface NavbarProps {
 }
@@ -16,7 +17,6 @@ const Navbar: FC<NavbarProps> = () => {
             navigate('/');
         }
     };
-
 
     const guestNavbarItems = [
         {
@@ -67,9 +67,18 @@ const Navbar: FC<NavbarProps> = () => {
             }
         },
         {
-            label: 'Account', icon: 'pi pi-fw pi-cog', command: () => {
-                navigate('/account');
-            }
+            label: 'Settings', icon: 'pi pi-fw pi-cog', items: [
+                {
+                    label: 'Account', icon: 'pi pi-fw pi-users', command: () => {
+                        navigate('/account');
+                    }
+                },
+                {
+                    label: 'Appointment', icon: 'pi pi-fw pi-calendar', command: () => {
+                        navigate('/settings/appointment');
+                    }
+                }
+            ]
         },
         logoutItem
     ];
@@ -82,10 +91,12 @@ const Navbar: FC<NavbarProps> = () => {
         },
         {
             label: 'Prescriptions', icon: 'pi pi-fw pi-book', command: () => {
+                navigate('/prescriptions');
             }
         },
         {
             label: 'Calendar', icon: 'pi pi-fw pi-calendar', command: () => {
+                navigate('/timetable');
             }
         },
         {
@@ -98,11 +109,11 @@ const Navbar: FC<NavbarProps> = () => {
 
     const getNavbarItemsByRole = (role: string) => {
         switch (role) {
-            case 'Admin':
+            case Roles.Admin:
                 return adminNavbarItems;
-            case 'Doctor':
+            case Roles.Doctor:
                 return doctorNavbarItems;
-            case 'Patient':
+            case Roles.Patient:
                 return patientNavbarItems;
             default:
                 return guestNavbarItems;

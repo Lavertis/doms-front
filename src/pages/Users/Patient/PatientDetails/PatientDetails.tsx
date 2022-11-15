@@ -12,6 +12,7 @@ import {Fieldset} from 'primereact/fieldset';
 import {authRequest} from "../../../../services/api.service";
 import userStore from "../../../../store/user-store";
 import {observer} from "mobx-react-lite";
+import {Roles} from "../../../../enums/Roles";
 
 const PatientDetails = () => {
     const {id} = useParams();
@@ -30,8 +31,8 @@ const PatientDetails = () => {
             });
     }, [id]);
 
-    useEffect(() => {
-        if (userStore.user?.role !== "Doctor")
+    const fetchPrescriptions = () => {
+        if (userStore.user?.role !== Roles.Doctor)
             return;
         authRequest.get(`prescriptions/patient/${id}`)
             .then(response => {
@@ -41,7 +42,11 @@ const PatientDetails = () => {
                 if (err.response?.data.error != null)
                     console.log(err.response.data.error);
             });
-    }, [id]);
+    }
+
+    useEffect(() => {
+        fetchPrescriptions();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="col-11 lg:col-10 xl:col-8 mx-auto">
@@ -50,7 +55,7 @@ const PatientDetails = () => {
                     <PatientFields patient={patient}/>
                 </Fieldset>
 
-                {userStore.user?.role === 'Doctor' && (
+                {userStore.user?.role === Roles.Doctor && (
                     <>
                         <Fieldset legend="Prescriptions" toggleable collapsed className="mb-3">
                             <div>
@@ -58,6 +63,7 @@ const PatientDetails = () => {
                                     patientId={patient?.id ?? ""}
                                     drugItems={drugItems}
                                     setDrugItems={setDrugItems}
+                                    fetchPrescriptions={fetchPrescriptions}
                                 />
                             </div>
                             <div>

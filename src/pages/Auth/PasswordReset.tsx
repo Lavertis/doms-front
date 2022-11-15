@@ -6,7 +6,7 @@ import {Button} from "primereact/button";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useNavigate} from "react-router-dom";
-import {authRequest} from "../../services/api.service";
+import {request} from "../../services/api.service";
 
 const passwordResetValidationSchema = Yup.object().shape({
     email: Yup.string().email().required('Required')
@@ -31,7 +31,7 @@ const PasswordReset = ({redirectTo}: PasswordResetProps) => {
         },
         validationSchema: passwordResetValidationSchema,
         onSubmit: values => {
-            authRequest.post('users/password-reset', {email: values.email})
+            request.post('users/password-reset', {email: values.email})
                 .then(_ => {
                     showToast('success', 'Password reset', 'A password reset link has been sent to your email');
                     setTimeout(() => {
