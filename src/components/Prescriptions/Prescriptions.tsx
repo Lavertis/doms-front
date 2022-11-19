@@ -10,6 +10,7 @@ import {authRequest} from "../../services/api.service";
 import userStore from "../../store/user-store";
 import {observer} from "mobx-react-lite";
 import {Roles} from "../../enums/Roles";
+import {saveFileFromApiResponse} from "../../utils/file-utils";
 
 interface PrescriptionsProps {
     prescriptions: Prescription[],
@@ -30,6 +31,14 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
         return <div className="text-center">No prescriptions</div>
     }
 
+    const downloadPrescription = (id: string) => {
+        authRequest.get(`prescriptions/${id}/download`, {responseType: 'blob'})
+            .then(response => saveFileFromApiResponse(response))
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     return (
         <div>
             <Accordion>
@@ -40,12 +49,18 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
                         <div className="flex justify-content-between align-items-center mb-3">
                             <div>
                                 <span className="font-bold">Fulfillment date: </span>
-                                {moment(prescription.fulfillmentDeadline).format('Do MMMM YYYY, HH:mm:ss')}
+                                {moment(prescription.fulfillmentDeadline).format('Do MMMM YYYY')}
                             </div>
                             <div>
+                                <Button
+                                    icon="pi pi-download"
+                                    className="p-button-rounded p-button-info mr-1"
+                                    aria-label="Download"
+                                    onClick={() => downloadPrescription(prescription.id)}
+                                />
                                 {userStore.user?.role === Roles.Doctor &&
                                     <Button
-                                        icon="pi pi-times"
+                                        icon="pi pi-trash"
                                         className="p-button-rounded p-button-danger"
                                         aria-label="Cancel"
                                         onClick={() => {
