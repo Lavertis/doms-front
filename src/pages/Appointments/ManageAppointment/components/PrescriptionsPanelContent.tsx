@@ -30,7 +30,7 @@ const PrescriptionsPanelContent = ({
     return (
         <div>
             {userStore.user?.role === Roles.Doctor &&
-                <div className="p-4 shadow-1 border-round w-full mb-5">
+                <div className="mt-1 mb-5">
                     <AddPrescription
                         patientId={patientId}
                         appointmentId={appointmentId}
@@ -40,7 +40,7 @@ const PrescriptionsPanelContent = ({
                     />
                 </div>
             }
-            <div className="p-4 shadow-1 border-round w-full">
+            <div>
                 <div className="text-center mb-5">
                     <div className="text-900 text-2xl font-medium mb-3">
                         Appointment prescriptions
