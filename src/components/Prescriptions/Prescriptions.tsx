@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Accordion, AccordionTab} from "primereact/accordion";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
@@ -11,6 +11,7 @@ import userStore from "../../store/user-store";
 import {observer} from "mobx-react-lite";
 import {Roles} from "../../enums/Roles";
 import {saveFileFromApiResponse} from "../../utils/file-utils";
+import {Toast} from "primereact/toast";
 
 interface PrescriptionsProps {
     prescriptions: Prescription[],
@@ -22,13 +23,11 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
     const [currentPrescriptionId, setCurrentPrescriptionId] = useState('');
 
     const deletePrescription = (id: string) => {
-        authRequest.delete(`prescriptions/${id}`).then(() => {
-            setPrescriptions(prescriptions.filter(prescription => prescription.id !== id));
-        });
-    }
-
-    if (prescriptions.length === 0) {
-        return <div className="text-center">No prescriptions</div>
+        authRequest.delete(`prescriptions/${id}`)
+            .then(() => {
+                toast.current?.show({severity: 'success', summary: 'Success', detail: 'Prescription deleted'});
+                setPrescriptions(prescriptions.filter(prescription => prescription.id !== id));
+            });
     }
 
     const downloadPrescription = (id: string) => {
@@ -39,8 +38,15 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
             });
     }
 
+    const toast = useRef<Toast>(null);
+
+    if (prescriptions.length === 0) {
+        return <div className="text-center">No prescriptions</div>
+    }
+
     return (
         <div>
+            <Toast ref={toast}/>
             <Accordion>
                 {prescriptions.map((prescription, idx) =>
                     <AccordionTab header={moment(prescription.createdAt).format('Do MMMM YYYY, HH:mm:ss')}
@@ -82,7 +88,7 @@ const Prescriptions = ({prescriptions, setPrescriptions}: PrescriptionsProps) =>
             </Accordion>
             <ConfirmationModal
                 title={"Delete confirmation"}
-                message={"Are you sure you want to delete this patient?"}
+                message={"Are you sure you want to delete this prescription?"}
                 isShown={modalIsShown}
                 confirmAction={() => deletePrescription(currentPrescriptionId)}
                 hide={() => setModalIsShown(false)}

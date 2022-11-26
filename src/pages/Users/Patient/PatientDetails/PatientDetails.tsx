@@ -13,6 +13,9 @@ import {authRequest} from "../../../../services/api.service";
 import userStore from "../../../../store/user-store";
 import {observer} from "mobx-react-lite";
 import {Roles} from "../../../../enums/Roles";
+import AddSickLeave from "../../../../components/SickLeave/AddSickLeave";
+import SickLeaves from "../../../../components/SickLeave/SickLeaves";
+import {SickLeave} from "../../../../types/sickLeave";
 
 const PatientDetails = () => {
     const {id} = useParams();
@@ -20,6 +23,8 @@ const PatientDetails = () => {
 
     const [drugItems, setDrugItems] = useState<Drug[]>([]);
     const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
+
+    const [sickLeaves, setSickLeaves] = useState<SickLeave[]>([]);
 
     useEffect(() => {
         authRequest.get(`/patients/${id}`)
@@ -44,8 +49,22 @@ const PatientDetails = () => {
             });
     }
 
+    const fetchSickLeaves = () => {
+        if (userStore.user?.role !== Roles.Doctor)
+            return;
+        authRequest.get(`sick-leaves/patient/${id}`)
+            .then(response => {
+                setSickLeaves(response.data.records)
+            })
+            .catch((err: AxiosError<ErrorResult>) => {
+                if (err.response?.data.error != null)
+                    console.log(err.response.data.error);
+            });
+    }
+
     useEffect(() => {
         fetchPrescriptions();
+        fetchSickLeaves();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
@@ -60,7 +79,7 @@ const PatientDetails = () => {
                         <Fieldset legend="Prescriptions" toggleable collapsed className="mb-3">
                             <div>
                                 <AddPrescription
-                                    patientId={patient?.id ?? ""}
+                                    patientId={patient?.id ?? ''}
                                     drugItems={drugItems}
                                     setDrugItems={setDrugItems}
                                     fetchPrescriptions={fetchPrescriptions}
@@ -76,17 +95,19 @@ const PatientDetails = () => {
                         </Fieldset>
 
                         <Fieldset legend="Sick leaves" toggleable collapsed className="mb-3">
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-                                ut
-                                labore et dolore magna aliqua.
-                                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-                                commodo
-                                consequat.
-                                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                                nulla
-                                pariatur. Excepteur sint occaecat
-                                cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-                                laborum.</p>
+                            <div>
+                                <AddSickLeave
+                                    patientId={patient?.id ?? ''}
+                                    fetchSickLeaves={fetchSickLeaves}
+                                />
+                            </div>
+                            <div>
+                                <h3>Sick leave history</h3>
+                                <SickLeaves
+                                    sickLeaves={sickLeaves.slice(0, 5)}
+                                    setSickLeaves={setSickLeaves}
+                                />
+                            </div>
                         </Fieldset>
                     </>
                 )}

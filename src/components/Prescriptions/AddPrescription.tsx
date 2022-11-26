@@ -95,6 +95,12 @@ const AddPrescription = ({
             }
             authRequest.post("prescriptions/doctor/current", data)
                 .then(() => {
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Prescription',
+                        detail: 'Prescription has been created',
+                        life: 5000
+                    });
                     setDrugItems([]);
                     fetchPrescriptions();
                 })

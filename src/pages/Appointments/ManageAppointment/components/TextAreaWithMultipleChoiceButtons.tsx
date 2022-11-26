@@ -34,10 +34,12 @@ const TextAreaWithMultipleChoiceButtons = ({
     const [previousSelectedValuesCount, setPreviousSelectedValuesCount] = React.useState<number>(selectedValues.length);
 
     useEffect(() => {
-        if (disabled) {
-            const selectedValuesFromTextArea = formik.values[fieldName].split(', ').map((p: string) => {
-                return availableValues.find((v: MultipleChoiceItem) => v.name === p);
-            });
+        if (disabled && availableValues.length > 0) {
+            const selectedValuesFromTextArea = formik.values[fieldName]
+                .split(', ')
+                .map((p: string) => {
+                    return availableValues.find((v: MultipleChoiceItem) => v.name === p);
+                });
             setSelectedValues(selectedValuesFromTextArea);
         }
     }, [disabled]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -57,7 +59,7 @@ const TextAreaWithMultipleChoiceButtons = ({
 
     return (
         <div className="flex flex-column lg:flex-row">
-            <div className="lg:col-6 lg:pr-4">
+            <div className={!disabled ? "lg:col-6 lg:pr-4" : "col-12"}>
                 <div onClick={onClickClearHandler} className="w-full h-full">
                     <InputTextarea
                         name={fieldName}

@@ -19,6 +19,8 @@ import userStore from "../../../../store/user-store";
 import {observer} from "mobx-react-lite";
 import {Roles} from "../../../../enums/Roles";
 import {AppointmentStatuses} from "../../../../enums/AppointmentStatuses";
+import SickLeavesPanelContent from "./SickLeavesPanelContent";
+import {SickLeave} from "../../../../types/sickLeave";
 
 const AppointmentValidationSchema = Yup.object().shape({
     interview: Yup.string().required('Interview is required'),
@@ -35,6 +37,7 @@ interface AppointmentDetailsProps {
 const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDetailsProps) => {
     const [appointment, setAppointment] = useState<Appointment>();
     const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
+    const [sickLeaves, setSickLeaves] = useState<SickLeave[]>([]);
     const [patientAge, setPatientAge] = useState<number>(0);
 
     const [symptoms, setSymptoms] = useState<MultipleChoiceItem[]>([]);
@@ -69,6 +72,27 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
         },
     });
 
+    useEffect(() => {
+        if (appointment?.doctorId == null)
+            return;
+
+        const mapQuickButtonToMultipleChoiceItem = (quickButton: QuickButton) => ({
+            id: quickButton.id,
+            name: quickButton.value
+        })
+        authRequest.get(`quick-buttons/doctor/${appointment?.doctorId}`)
+            .then(response => {
+                const data = response.data;
+                setAvailableSymptoms(data.interviewQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
+                setAvailableDiseases(data.diagnosisQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
+                setAvailableRecommendations(data.recommendationsQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
+            })
+            .catch((err: AxiosError<ErrorResult>) => {
+                if (err.response?.data.error != null)
+                    console.log(err.response.data.error);
+            });
+    }, [appointment?.doctorId]);
+
     const fetchPrescriptions = () => {
         const url = userStore.user?.role === Roles.Doctor ?
             `prescriptions/appointment/${appointmentId}` : `prescriptions/patient/current/appointment/${appointmentId}`;
@@ -83,23 +107,19 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
             });
     }
 
-    useEffect(() => {
-        const mapQuickButtonToMultipleChoiceItem = (quickButton: QuickButton) => ({
-            id: quickButton.id,
-            name: quickButton.value
-        })
-        authRequest.get(`quick-buttons/doctor/current`)
+    const fetchSickLeaves = () => {
+        const url = userStore.user?.role === Roles.Doctor ?
+            `sick-leaves/appointment/${appointmentId}` : `sick-leaves/patient/current/appointment/${appointmentId}`;
+
+        authRequest.get(url)
             .then(response => {
-                const data = response.data;
-                setAvailableSymptoms(data.interviewQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
-                setAvailableDiseases(data.diagnosisQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
-                setAvailableRecommendations(data.recommendationsQuickButtons.map(mapQuickButtonToMultipleChoiceItem));
+                setSickLeaves(response.data.records)
             })
             .catch((err: AxiosError<ErrorResult>) => {
                 if (err.response?.data.error != null)
                     console.log(err.response.data.error);
             });
-    }, []);
+    }
 
     useEffect(() => {
         authRequest.get(`appointments/user/current/${appointmentId}`)
@@ -119,6 +139,7 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
             });
 
         fetchPrescriptions();
+        fetchSickLeaves();
     }, [appointmentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
@@ -233,6 +254,16 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                         drugItems={drugItems}
                         setDrugItems={setDrugItems}
                         fetchPrescriptions={fetchPrescriptions}
+                    />
+                </TabPanel>
+
+                <TabPanel header={<span className="ml-2">Sick leaves</span>} leftIcon="pi pi-clone">
+                    <SickLeavesPanelContent
+                        patientId={patient?.id}
+                        appointmentId={appointmentId}
+                        sickLeaves={sickLeaves}
+                        setSickLeaves={setSickLeaves}
+                        fetchSickLeaves={fetchSickLeaves}
                     />
                 </TabPanel>
             </TabView>
