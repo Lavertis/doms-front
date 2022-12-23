@@ -10,6 +10,7 @@ import userStore from '../../../store/user-store';
 import appointmentTypeStore from '../../../store/appointment-type-store';
 import appointmentStatusStore from '../../../store/appointment-status-store';
 import {Doctor} from '../../../types/Users/Doctor';
+import {uuidToBase64} from "../../../utils/uuid-utils";
 
 export const updateEventsCallback = async (info: any, successCallback: any, failureCallback: any, selectedDoctor?: Doctor) => {
     let appointmentQueryParams: any = { // TODO make appointment query params the same as timetable query params
@@ -57,12 +58,12 @@ export const onEventClickCallback = (eventInfo: any, navigate: any) => {
     const event = eventInfo.event;
     if (event.display === 'background')
         return;
-    if (eventInfo.jsEvent.path.filter((element: any) => element.className && element.className.split(' ').includes('p-button-danger')).length)
+    if (eventInfo.jsEvent.path.filter((element: any) => element.className && element.className.split(' ').includes('pi')).length)
         return;
     // TODO check if newly added event
 
 
-    navigate(`/appointment/${event}`); // TODO add toBase64 after merge
+    navigate(`/appointments/${uuidToBase64(event.id)}/edit`);
 };
 
 export const onEventReceiveCallback = (info: any, eventStates: EventStates) => {

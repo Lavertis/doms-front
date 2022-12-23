@@ -16,6 +16,7 @@ import {
 } from './utils';
 import appointmentTypeStore from '../../../store/appointment-type-store';
 import appointmentStatusStore from '../../../store/appointment-status-store';
+import {uuidToBase64} from "../../../utils/uuid-utils";
 
 export const onEventChangeCallback = (changeInfo: any, eventStates: EventStates) => {
     const eventId = changeInfo.event.id;
@@ -196,8 +197,8 @@ export const onEventClickCallback = (eventInfo: any, navigate: any, editMode: bo
         return;
     if (editMode)
         return;
-    if (eventInfo.jsEvent.path.filter((element: any) => element.className && element.className.split(' ').includes('p-button')).length)
+    if (eventInfo.jsEvent.path.filter((element: any) => element.className && element.className.split(' ').includes('pi')).length)
         return;
 
-    navigate(`/appointment/${event}`); // TODO add toBase64 after merge
+    navigate(`/appointments/${uuidToBase64(event.id)}/edit`);
 };
