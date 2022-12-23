@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
-import {Patient} from "../../../../types/patient";
-import {LazyParams} from "../../../../types/data-table";
-import {useNavigate} from "react-router-dom";
-import {Button} from "primereact/button";
-import {DataTable} from "primereact/datatable";
-import {Column} from "primereact/column";
-import ConfirmationModal from "../../../../components/ConfirmationModal";
-import {AxiosError} from "axios";
-import {authRequest} from "../../../../services/api.service";
+import {Patient} from '../../../../types/Users/Patient';
+import {LazyParams} from '../../../../types/data-table';
+import {useNavigate} from 'react-router-dom';
+import {Button} from 'primereact/button';
+import {DataTable} from 'primereact/datatable';
+import {Column} from 'primereact/column';
+import ConfirmationModal from '../../../../components/ConfirmationModal';
+import {AxiosError} from 'axios';
+import {authRequest} from '../../../../services/api.service';
 
 interface PatientListProps {
     patients: Patient[];

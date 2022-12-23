@@ -1,17 +1,19 @@
-import {IUser} from "../types/user";
+import {IUser} from '../types/user';
 import jwt from 'jwt-decode';
 
-import {action, makeObservable, observable} from "mobx";
-import {IJwtToken} from "../types/token";
-import {signIn, SignInRequest} from "../api/auth.api";
-import {request} from "../services/api.service";
+import {action, makeObservable, observable} from 'mobx';
+import {IJwtToken} from '../types/token';
+import {signIn, SignInRequest} from '../api/auth.api';
+import {request} from '../services/api.service';
+import appointmentTypeStore from './appointment-type-store';
+import appointmentStatusStore from './appointment-status-store';
 
 class UserStore {
-    user: IUser | null = null;
-
     constructor() {
         makeObservable(this, {user: observable, getUserData: action});
     }
+
+    user: IUser | null = null;
 
     async getUserData(jwtToken: string) {
         if (!!jwtToken) {
@@ -22,8 +24,10 @@ class UserStore {
                 role: decodedToken.role,
                 userName: decodedToken.name,
                 jwtToken: jwtToken
-            } as IUser
+            } as IUser;
         }
+        appointmentTypeStore.fetchAppointmentTypes().then();  // TODO this is kinda retarded
+        appointmentStatusStore.fetchAppointmentStatuses().then();
     }
 
     async signIn(signInData: SignInRequest): Promise<boolean> {
@@ -36,11 +40,11 @@ class UserStore {
     }
 
     async refreshToken() {
-        return request.post("auth/refresh-token", {}, {withCredentials: true})
+        await request.post('auth/refresh-token', {}, {withCredentials: true})
             .then(async response => {
                 const jwtToken = response.data.jwtToken;
                 await this.getUserData(jwtToken);
-            })
+            });
     }
 
     logout = () => {

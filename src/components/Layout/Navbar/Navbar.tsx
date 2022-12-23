@@ -1,9 +1,9 @@
 import {FC} from 'react';
 import {Menubar} from 'primereact/menubar';
 import {useNavigate} from 'react-router-dom';
-import userStore from "../../../store/user-store";
-import {observer} from "mobx-react-lite";
-import {Roles} from "../../../enums/Roles";
+import userStore from '../../../store/user-store';
+import {observer} from 'mobx-react-lite';
+import {Roles} from '../../../enums/Roles';
 
 interface NavbarProps {
 }
@@ -13,7 +13,7 @@ const Navbar: FC<NavbarProps> = () => {
 
     const logoutItem = {
         label: 'Logout', icon: 'pi pi-fw pi-sign-out', command: () => {
-            userStore.logout()
+            userStore.logout();
             navigate('/');
         }
     };
@@ -62,6 +62,11 @@ const Navbar: FC<NavbarProps> = () => {
             }
         },
         {
+            label: 'Timetable', icon: 'pi pi-fw pi-calendar', command: () => {
+                navigate('/timetable');
+            }
+        },
+        {
             label: 'Users', icon: 'pi pi-fw pi-users', command: () => {
                 navigate('/users');
             }
@@ -95,7 +100,7 @@ const Navbar: FC<NavbarProps> = () => {
             }
         },
         {
-            label: 'Calendar', icon: 'pi pi-fw pi-calendar', command: () => {
+            label: 'Timetable', icon: 'pi pi-fw pi-calendar', command: () => {
                 navigate('/timetable');
             }
         },

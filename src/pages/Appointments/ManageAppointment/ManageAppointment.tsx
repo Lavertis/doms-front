@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import AppointmentHistory from "./components/AppointmentHistory";
-import AppointmentDetails from "./components/AppointmentDetails";
-import {useParams} from "react-router-dom";
-import {Patient} from "../../../types/patient";
-import {uuidFromBase64} from "../../../utils/uuid-utils";
+import AppointmentHistory from './components/AppointmentHistory';
+import AppointmentDetails from './components/AppointmentDetails';
+import {useParams} from 'react-router-dom';
+import {Patient} from '../../../types/Users/Patient';
+import {uuidFromBase64} from '../../../utils/uuid-utils';
 import userStore from "../../../store/user-store";
 import {observer} from "mobx-react-lite";
 import {Roles} from "../../../enums/Roles";

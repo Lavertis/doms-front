@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Fieldset} from 'primereact/fieldset';
-import {useParams} from "react-router-dom";
-import {Patient} from "../../../../types/patient";
-import DoctorFields from "./components/DoctorFields";
-import {authRequest} from "../../../../services/api.service";
+import {useParams} from 'react-router-dom';
+import {Patient} from '../../../../types/Users/Patient';
+import DoctorFields from './components/DoctorFields';
+import {authRequest} from '../../../../services/api.service';
 
 const DoctorDetails = () => {
     const {id} = useParams();

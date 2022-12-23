@@ -1,6 +1,6 @@
 import React, {FC, useEffect, useState} from 'react';
 import {uuidFromBase64, uuidToBase64} from '../../utils/uuid-utils';
-import {Appointment} from '../../types/appointment';
+import {Appointment} from '../../types/Appointments/Appointment';
 import {AxiosError, AxiosResponse} from 'axios';
 import {useNavigate, useParams} from 'react-router-dom';
 import FormInput from '../../components/Form/FormInput';
@@ -9,22 +9,24 @@ import {useFormik} from 'formik';
 import {InputText} from 'primereact/inputtext';
 import moment from 'moment';
 import {InputTextarea} from 'primereact/inputtextarea';
-import {Patient} from '../../types/patient';
 import * as Yup from 'yup';
 import {Calendar} from 'primereact/calendar';
-import {formatErrorsForFormik} from "../../utils/error-utils";
-import {ErrorResult} from "../../types/error";
-import {authRequest} from "../../services/api.service";
-import {AppointmentStatuses} from "../../enums/AppointmentStatuses";
+import {formatErrorsForFormik} from '../../utils/error-utils';
+import {ErrorResult} from '../../types/error';
+import {authRequest} from '../../services/api.service';
+import {Patient} from '../../types/Users/Patient';
+import {AppointmentStatuses} from '../../enums/AppointmentStatuses';
+import appointmentStatusStore from '../../store/appointment-status-store';
+import AppointmentStatusStore from '../../store/appointment-status-store';
+import {capitalizeFirstLetter} from '../../utils/string-utils';
+import AppointmentTypeStore from '../../store/appointment-type-store';
 
 interface AppointmentPageProps {
 }
 
-
 const UpdateAppointmentSchema = Yup.object().shape({
     description: Yup.string(),
-    status: Yup.string()
-        .oneOf([AppointmentStatuses.Pending, AppointmentStatuses.Accepted, AppointmentStatuses.Cancelled, AppointmentStatuses.Rejected, AppointmentStatuses.Completed], 'Invalid status'),
+    status: Yup.string().test((value, _) => Object.values(AppointmentStatuses).includes((value!.toUpperCase() as any)))
 });
 
 const AppointmentEdit: FC<AppointmentPageProps> = () => {
@@ -34,7 +36,7 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
 
     const formik = useFormik({
         initialValues: {
-            date: '',
+            date: new Date(),
             time: new Date(),
             description: '',
             status: '',
@@ -45,15 +47,26 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
         },
         validationSchema: UpdateAppointmentSchema,
         onSubmit: values => {
-            let appointmentDate = moment(values.date + ' ' + moment(values.time).format('HH:mm')); // TODO merge this into single date
+            let appointmentDate = moment(values.date + ' ' + moment(values.time).format('HH:mm'));
+            if (appointmentDate.clone().startOf('day').isBefore(moment().startOf('day'))) {
+                formik.setFieldError('date', 'Selected date must be in the future');
+                return;
+            }
+            if (appointmentDate.isBefore(moment())) {
+                formik.setFieldError('time', 'Selected time must be in the future');
+                return;
+            }
             const requestBody = {
                 date: appointmentDate.toISOString(),
                 description: values.description,
-                status: values.status
+                statusId: appointmentStatusStore.getByName(values.status.toUpperCase())!.id
             };
             authRequest.patch(`appointments/user/current/${uuidFromBase64(id!)}`, requestBody)
                 .then((response: AxiosResponse<Appointment>) => {
-                    setAppointment(response.data);
+                    const appointment = response.data;
+                    appointment.status = AppointmentStatusStore.getById(appointment.statusId);
+                    appointment.type = AppointmentTypeStore.getById(appointment.typeId);
+                    setAppointment(appointment);
                 })
                 .catch((err: AxiosError<ErrorResult>) => {
                     if (err.response?.data.error != null)
@@ -66,24 +79,27 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
 
     const isChanged = () => {
         return (
-            moment(appointment?.date).format('YYYY-MM-DD') !== formik.values.date ||
+            moment(appointment?.date).format('YYYY-MM-DD') !== moment(formik.values.date).format('YYYY-MM-DD') ||
             moment(appointment?.date).format('HH:mm') !== moment(formik.values.time).format('HH:mm') ||
             appointment?.description !== formik.values.description ||
-            appointment?.status !== formik.values.status
+            appointment?.status?.name !== formik.values.status
         );
     };
 
     useEffect(() => {
         authRequest.get(`appointments/user/current/${uuidFromBase64(id!)}`)
             .then((response: AxiosResponse<Appointment>) => {
-                setAppointment(response.data);
+                const appointment = response.data;
+                appointment.status = AppointmentStatusStore.getById(appointment.statusId);
+                appointment.type = AppointmentTypeStore.getById(appointment.typeId);
+                setAppointment(appointment);
                 formik.setValues({
                     ...formik.values,
-                    date: moment(response.data.date).format('YYYY-MM-DD'),
-                    time: moment(response.data.date).toDate(),
+                    date: moment(appointment.date).toDate(),
+                    time: moment(appointment.date).toDate(),
                     description: response.data.description,
-                    status: response.data.status,
-                    type: response.data.type
+                    status: appointment.status!.name,
+                    type: appointment.type!.name
                 });
             })
             .catch((err: AxiosError<ErrorResult>) => {
@@ -121,7 +137,6 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
             <div className="text-center mb-5">
                 <div className="text-900 text-3xl font-medium mb-3">Appointment</div>
             </div>
-            {/*{error && <Message className="w-full mb-2" severity="error" text={error}/>}*/}
             <form onSubmit={formik.handleSubmit}>
                 <div className="grid p-fluid">
                     <div className="col-12 md:col-6">
@@ -138,7 +153,7 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                         <Calendar
                             id="date"
                             dateFormat="dd/mm/yy"
-                            value={moment(formik.values.date).toDate()}
+                            value={formik.values.date}
                             placeholder="Pick a date"
                             onChange={formik.handleChange}
                             showIcon
@@ -173,8 +188,8 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                     <div className="col-12 md:col-6">
                         <label htmlFor="status" className="block text-900 font-medium mb-2">Status</label>
                         <div className="p-inputgroup">
-                            <InputText id="status" disabled value={formik.values.status}/>
-                            {([AppointmentStatuses.Pending] as string[]).includes(formik.values.status) &&
+                            <InputText id="status" disabled value={capitalizeFirstLetter(formik.values.status)}/>
+                            {[AppointmentStatuses.Pending].includes(formik.values.status as AppointmentStatuses) &&
                                 <Button
                                     icon="pi pi-check"
                                     className="p-button-success"
@@ -183,7 +198,7 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                                     }}
                                 />
                             }
-                            {([AppointmentStatuses.Pending, AppointmentStatuses.Accepted] as string[]).includes(formik.values.status) &&
+                            {[AppointmentStatuses.Pending, AppointmentStatuses.Accepted].includes(formik.values.status as AppointmentStatuses) &&
                                 <Button
                                     icon="pi pi-times"
                                     className="p-button-danger"
@@ -202,14 +217,21 @@ const AppointmentEdit: FC<AppointmentPageProps> = () => {
                 </div>
                 <div className="grid p-fluid">
                     <div className="col-12 md:col-6">
-                        <Button label="Update" type="submit" icon="pi pi-save" className="w-full mb-3"
-                                disabled={!isChanged()}/>
+                        <Button
+                            label="Update"
+                            type="submit"
+                            icon="pi pi-save"
+                            className="w-full mb-3"
+                            disabled={!isChanged()}
+                        />
                     </div>
                     <div className="col-12 md:col-6">
-                        <Button label="Start appointment" icon="pi pi-caret-right" type="submit"
-                                className="w-full p-button-success"
-                                disabled={appointment?.status !== AppointmentStatuses.Accepted}
-                                onClick={() => navigate(`/appointments/${uuidToBase64(appointment.id)}`)}
+                        <Button
+                            label="Start appointment"
+                            icon="pi pi-caret-right"
+                            className="w-full p-button-success"
+                            disabled={appointment?.status?.name !== AppointmentStatuses.Accepted}
+                            onClick={() => navigate(`/appointments/${uuidToBase64(appointment.id)}`)}
                         />
                     </div>
                 </div>

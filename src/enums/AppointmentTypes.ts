@@ -1,4 +1,4 @@
 export enum AppointmentTypes {
-    Consultation = 'Consultation',
-    Checkup = 'Checkup'
+    Consultation = 'CONSULTATION',
+    Checkup = 'CHECKUP'
 }

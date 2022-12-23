@@ -1,5 +1,5 @@
 import {FC, useEffect, useState} from 'react';
-import {Appointment} from '../../../types/appointment';
+import {Appointment} from '../../../types/Appointments/Appointment';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column';
 import {AxiosError, AxiosResponse} from 'axios';
@@ -10,11 +10,14 @@ import moment from 'moment';
 import {Calendar} from 'primereact/calendar';
 import {useNavigate} from 'react-router-dom';
 import {uuidToBase64} from '../../../utils/uuid-utils';
-import {authRequest} from "../../../services/api.service";
-import {observer} from "mobx-react-lite";
-import userStore from "../../../store/user-store";
-import {AppointmentTypes} from "../../../enums/AppointmentTypes";
-import {AppointmentStatuses} from "../../../enums/AppointmentStatuses";
+import {authRequest} from '../../../services/api.service';
+import {observer} from 'mobx-react-lite';
+import userStore from '../../../store/user-store';
+import {PagedResponse} from '../../../types/PagedResponse';
+import AppointmentStatusStore from '../../../store/appointment-status-store';
+import AppointmentTypeStore from '../../../store/appointment-type-store';
+import {capitalizeFirstLetter} from '../../../utils/string-utils';
+import {AppointmentStatuses} from '../../../enums/AppointmentStatuses';
 
 interface DoctorAppointmentsTableProps {
 }
@@ -35,23 +38,24 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
         }
     });
 
-    const statuses = [AppointmentStatuses.Rejected, AppointmentStatuses.Accepted, AppointmentStatuses.Pending, AppointmentStatuses.Cancelled, AppointmentStatuses.Completed]; // TODO temporary location
-    const types = [AppointmentTypes.Checkup, AppointmentTypes.Consultation]; // TODO temporary location
-
     useEffect(() => {
         setLoading(true);
         const queryParams = {
             pageNumber: lazyParams.page + 1,
             pageSize: lazyParams.rows,
-            status: lazyParams.filters.status.value,
+            status: lazyParams.filters.status.value ? (lazyParams.filters.status.value as string).toUpperCase() : null,
             type: lazyParams.filters.type.value,
             dateStart: lazyParams.filters.date.value ? moment(lazyParams.filters.date.value[0]).toISOString(true) : null,
             dateEnd: lazyParams.filters.date.value ? moment(lazyParams.filters.date.value[1]).toISOString(true) : null,
         };
 
         authRequest.get(`appointments/search?doctorId=${userStore.user?.id}`, {params: queryParams})
-            .then((response: AxiosResponse) => {
-                setAppointments(response.data.records);
+            .then((response: AxiosResponse<PagedResponse<Appointment>>) => {
+                setAppointments(response.data.records.map((appointment) => {
+                    appointment.status = AppointmentStatusStore.getById(appointment.statusId);
+                    appointment.type = AppointmentTypeStore.getById(appointment.typeId);
+                    return appointment;
+                }));
                 setTotalRecords(response.data.totalRecords);
                 setLoading(false);
             }).catch((err: AxiosError) => {
@@ -70,8 +74,8 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
     const statusRowFilterTemplate = (options: any) => {
         return <Dropdown
             value={options.value}
-            options={statuses}
-            onChange={(e) => options.filterCallback(e.value)}
+            options={AppointmentStatusStore.appointmentStatuses.map(appointmentStatus => capitalizeFirstLetter(appointmentStatus.name))}
+            onChange={(e) => options.filterCallback(e.value.toUpperCase())}
             itemTemplate={dropdownItemTemplate}
             placeholder="Select a status"
             className="p-column-filter"
@@ -93,7 +97,7 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
     const typeRowFilterTemplate = (options: any) => {
         return <Dropdown
             value={options.value}
-            options={types}
+            options={AppointmentTypeStore.appointmentTypes.map(appointmentType => capitalizeFirstLetter(appointmentType.name))}
             onChange={(e) => options.filterCallback(e.value)}
             itemTemplate={dropdownItemTemplate}
             placeholder="Select a type"
@@ -113,12 +117,11 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
     const controlsTemplate = (rowData: Appointment) => {
         return <div className="flex justify-content-center">
             <Button onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}/edit`)} icon="pi pi-cog"/>
-            {rowData.status !== AppointmentStatuses.Pending && rowData.status !== AppointmentStatuses.Cancelled ?
-                <Button
-                    className={'ml-1 ' + (rowData.status === AppointmentStatuses.Completed ? "p-button-info" : "p-button-success")}
-                    onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}`)}
-                    icon={'pi ' + (rowData.status === AppointmentStatuses.Completed ? 'pi-eye' : 'pi-caret-right')}
-                /> : null}
+            <Button
+                className={'ml-1 ' + (rowData.status?.name === AppointmentStatuses.Completed ? 'p-button-info' : 'p-button-success')}
+                onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}`)}
+                icon={'pi ' + (rowData.status?.name === AppointmentStatuses.Completed ? 'pi-eye' : 'pi-caret-right')}
+            />
         </div>;
     };
 
@@ -147,14 +150,32 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
         >
             <Column field="patientFirstName" header="First name"/>
             <Column field="patientLastName" header="Last name"/>
-            <Column field="date" header="Date" filter filterElement={dateRowFilterTemplate} showFilterMatchModes={false}
-                    body={dateTemplate}/>
+            <Column
+                field="date"
+                header="Date"
+                filter
+                filterElement={dateRowFilterTemplate}
+                showFilterMatchModes={false}
+                body={dateTemplate}
+            />
             <Column field="date" header="Time" body={timeTemplate}/>
             <Column field="patientPhoneNumber" header="Phone number"/>
-            <Column field="type" header="Type" filter filterElement={typeRowFilterTemplate}
-                    showFilterMatchModes={false}/>
-            <Column field="status" header="Status" filter filterElement={statusRowFilterTemplate}
-                    showFilterMatchModes={false}/>
+            <Column
+                field="type"
+                header="Type"
+                body={(rowData: Appointment) => capitalizeFirstLetter(rowData.type?.name as string)}
+                filter
+                filterElement={typeRowFilterTemplate}
+                showFilterMatchModes={false}
+            />
+            <Column
+                field="status"
+                header="Status"
+                body={(rowData: Appointment) => capitalizeFirstLetter(rowData.status?.name as string)}
+                filter
+                filterElement={statusRowFilterTemplate}
+                showFilterMatchModes={false}
+            />
             <Column header="Actions" body={controlsTemplate}/>
         </DataTable>
     );

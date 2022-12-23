@@ -1,26 +1,28 @@
 import React, {useEffect, useState} from 'react';
-import {Appointment} from "../../../../types/appointment";
-import {AxiosError, AxiosResponse} from "axios";
-import {Patient} from "../../../../types/patient";
+import {Appointment} from '../../../../types/Appointments/Appointment';
+import {AxiosError, AxiosResponse} from 'axios';
+import {Patient} from '../../../../types/Users/Patient';
 import {TabPanel, TabView} from 'primereact/tabview';
-import {Prescription} from "../../../../types/prescription";
-import moment from "moment";
-import {Button} from "primereact/button";
-import {useFormik} from "formik";
-import * as Yup from "yup";
-import {MultipleChoiceItem, QuickButton} from "../../../../types/quick-button";
-import {ErrorResult} from "../../../../types/error";
-import {formatErrorsForFormik} from "../../../../utils/error-utils";
-import TextAreaWithMultipleChoiceButtons from "./TextAreaWithMultipleChoiceButtons";
-import PrescriptionsPanelContent from "./PrescriptionsPanelContent";
-import {Drug} from "../../../../types/drugs";
-import {authRequest} from "../../../../services/api.service";
-import userStore from "../../../../store/user-store";
-import {observer} from "mobx-react-lite";
-import {Roles} from "../../../../enums/Roles";
-import {AppointmentStatuses} from "../../../../enums/AppointmentStatuses";
-import SickLeavesPanelContent from "./SickLeavesPanelContent";
-import {SickLeave} from "../../../../types/sickLeave";
+import {Prescription} from '../../../../types/prescription';
+import moment from 'moment';
+import {Button} from 'primereact/button';
+import {useFormik} from 'formik';
+import * as Yup from 'yup';
+import {ErrorResult} from '../../../../types/error';
+import {formatErrorsForFormik} from '../../../../utils/error-utils';
+import TextAreaWithMultipleChoiceButtons from './TextAreaWithMultipleChoiceButtons';
+import PrescriptionsPanelContent from './PrescriptionsPanelContent';
+import {Drug} from '../../../../types/drugs';
+import {authRequest} from '../../../../services/api.service';
+import {AppointmentStatuses} from '../../../../enums/AppointmentStatuses';
+import AppointmentStatusStore from '../../../../store/appointment-status-store';
+import AppointmentTypeStore from '../../../../store/appointment-type-store';
+import userStore from '../../../../store/user-store';
+import {observer} from 'mobx-react-lite';
+import {Roles} from '../../../../enums/Roles';
+import SickLeavesPanelContent from './SickLeavesPanelContent';
+import {SickLeave} from '../../../../types/sickLeave';
+import {MultipleChoiceItem, QuickButton} from '../../../../types/quick-button';
 
 const AppointmentValidationSchema = Yup.object().shape({
     interview: Yup.string().required('Interview is required'),
@@ -58,7 +60,10 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
         },
         validationSchema: AppointmentValidationSchema,
         onSubmit: values => {
-            const newValues = {...values, status: AppointmentStatuses.Completed}
+            const newValues = {
+                ...values,
+                statusId: AppointmentStatusStore.getByName(AppointmentStatuses.Completed)!.id
+            };
             authRequest.patch(`appointments/user/current/${appointment?.id}`, newValues)
                 .then((response: AxiosResponse<Appointment>) => {
                     setAppointment(response.data);
@@ -125,6 +130,8 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
         authRequest.get(`appointments/user/current/${appointmentId}`)
             .then((response: AxiosResponse<Appointment>) => {
                 const appointment = response.data;
+                appointment.status = AppointmentStatusStore.getById(appointment.statusId);
+                appointment.type = AppointmentTypeStore.getById(appointment.typeId);
                 setAppointment(appointment);
                 if (appointment.interview != null)
                     formik.setFieldValue('interview', appointment.interview);
@@ -197,14 +204,12 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                     </div>
                 </div>
                 <div>
-                    {userStore.user?.role === Roles.Doctor &&
-                        <form onSubmit={formik.handleSubmit} noValidate>
-                            {appointment && appointment?.status !== AppointmentStatuses.Completed ?
-                                <Button label="Save and complete" type="submit"></Button> :
-                                <Button label={AppointmentStatuses.Completed} type="button" disabled></Button>
-                            }
-                        </form>
-                    }
+                    <form onSubmit={formik.handleSubmit} noValidate>
+                        {appointment && appointment?.status?.name !== AppointmentStatuses.Completed ?
+                            <Button label="Save and complete" type="submit"></Button> :
+                            <Button label="Completed" type="button" disabled></Button>
+                        }
+                    </form>
                 </div>
             </div>
 
@@ -216,8 +221,8 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                         selectedValues={symptoms}
                         setSelectedValues={setSymptoms}
                         fieldName={'interview'}
-                        fieldPlaceholder={"Interview with patient"}
-                        disabled={appointment?.status === AppointmentStatuses.Completed}
+                        fieldPlaceholder={'Interview with patient'}
+                        disabled={appointment?.status?.name === AppointmentStatuses.Completed}
                     />
                 </TabPanel>
 
@@ -228,8 +233,8 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                         selectedValues={diseases}
                         setSelectedValues={setDiseases}
                         fieldName={'diagnosis'}
-                        fieldPlaceholder={"Diagnosed disease(s)"}
-                        disabled={appointment?.status === AppointmentStatuses.Completed}
+                        fieldPlaceholder={'Diagnosed disease(s)'}
+                        disabled={appointment?.status?.name === AppointmentStatuses.Completed}
                     />
                 </TabPanel>
 
@@ -240,8 +245,8 @@ const AppointmentDetails = ({appointmentId, patient, setPatient}: AppointmentDet
                         selectedValues={recommendations}
                         setSelectedValues={setRecommendations}
                         fieldName={'recommendations'}
-                        fieldPlaceholder={"Recommended treatment"}
-                        disabled={appointment?.status === AppointmentStatuses.Completed}
+                        fieldPlaceholder={'Recommended treatment'}
+                        disabled={appointment?.status?.name === AppointmentStatuses.Completed}
                     />
                 </TabPanel>
 

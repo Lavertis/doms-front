@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {TabPanel, TabView} from "primereact/tabview";
-import DoctorList from "./components/DoctorList";
-import PatientList from "./components/PatientList";
-import {FilterMatchMode} from "primereact/api";
-import {Doctor} from "../../../types/doctor";
-import {Patient} from "../../../types/patient";
-import {LazyParams} from "../../../types/data-table";
-import {AxiosError} from "axios";
-import {authRequest} from "../../../services/api.service";
-import {observer} from "mobx-react-lite";
-import userStore from "../../../store/user-store";
+import {TabPanel, TabView} from 'primereact/tabview';
+import DoctorList from './components/DoctorList';
+import PatientList from './components/PatientList';
+import {FilterMatchMode} from 'primereact/api';
+import {Doctor} from '../../../types/Users/Doctor';
+import {LazyParams} from '../../../types/data-table';
+import {AxiosError} from 'axios';
+import {authRequest} from '../../../services/api.service';
+import {observer} from 'mobx-react-lite';
+import userStore from '../../../store/user-store';
+import {Patient} from '../../../types/Users/Patient';
 import {Roles} from "../../../enums/Roles";
 
 const UserManagement = () => {

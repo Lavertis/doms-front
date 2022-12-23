@@ -1,6 +1,6 @@
 import React from 'react';
-import moment from "moment/moment";
-import {Patient} from "../../../../../types/patient";
+import moment from 'moment/moment';
+import {Patient} from '../../../../../types/Users/Patient';
 
 interface PatientFieldsProps {
     patient?: Patient;

@@ -7,21 +7,22 @@ import Register from './pages/Auth/Register';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import AppointmentEdit from './pages/Appointments/AppointmentEdit';
 import AccountManagement from './pages/AccountManagement/AccountManagement';
-import ManageAppointment from "./pages/Appointments/ManageAppointment/ManageAppointment";
-import UserManagement from "./pages/Users/UserManagement/UserManagement";
-import AddDoctor from "./pages/Users/AddDoctor";
-import AppointmentsTable from "./pages/Appointments/AppointmentsTable/AppointmentsTable";
-import ConfirmEmail from "./pages/Auth/ConfirmEmail";
-import NewPassword from "./pages/Auth/NewPassword";
-import PasswordReset from "./pages/Auth/PasswordReset";
-import PatientDetails from "./pages/Users/Patient/PatientDetails/PatientDetails";
-import DoctorDetails from "./pages/Users/Doctor/DoctorDetails/DoctorDetails";
-import userStore from "./store/user-store";
-import {observer} from "mobx-react-lite";
-import PatientPrescriptionHistory from "./pages/Prescriptions/PatientPrescriptionHistory";
-import {ProgressSpinner} from "primereact/progressspinner";
-import AppointmentSettings from "./pages/Settings/AppointmentSettings/AppointmentSettings";
-import {Roles} from "./enums/Roles";
+import ManageAppointment from './pages/Appointments/ManageAppointment/ManageAppointment';
+import UserManagement from './pages/Users/UserManagement/UserManagement';
+import AddDoctor from './pages/Users/AddDoctor';
+import AppointmentsTable from './pages/Appointments/AppointmentsTable/AppointmentsTable';
+import ConfirmEmail from './pages/Auth/ConfirmEmail';
+import NewPassword from './pages/Auth/NewPassword';
+import PasswordReset from './pages/Auth/PasswordReset';
+import PatientDetails from './pages/Users/Patient/PatientDetails/PatientDetails';
+import DoctorDetails from './pages/Users/Doctor/DoctorDetails/DoctorDetails';
+import userStore from './store/user-store';
+import {observer} from 'mobx-react-lite';
+import PatientPrescriptionHistory from './pages/Prescriptions/PatientPrescriptionHistory';
+import {ProgressSpinner} from 'primereact/progressspinner';
+import AppointmentSettings from './pages/Settings/AppointmentSettings/AppointmentSettings';
+import {Roles} from './enums/Roles';
+import TimetablePage from './pages/Timetable/TimetablePage';
 
 
 function App() {
@@ -76,11 +77,15 @@ function App() {
                         <Route element={<ProtectedRoute allowedRoles={[Roles.Admin]}/>}>
                             <Route path="/doctors/add" element={<AddDoctor/>}/>
                         </Route>
+
+                        <Route element={<ProtectedRoute allowedRoles={[Roles.Patient, Roles.Doctor]}/>}>
+                            <Route path="/timetable" element={<TimetablePage/>}/>
+                        </Route>
                     </Routes>
                 </Layout>
             </BrowserRouter>
         );
-    }
+    };
 
     useEffect(() => {
         userStore.refreshToken().then(setAppContent, setAppContent);

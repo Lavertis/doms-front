@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
-import {DataTable} from "primereact/datatable";
-import {Column} from "primereact/column";
-import {Doctor} from "../../../../types/doctor";
-import {LazyParams} from "../../../../types/data-table";
-import {Button} from "primereact/button";
-import {useNavigate} from "react-router-dom";
-import ConfirmationModal from "../../../../components/ConfirmationModal";
-import {authRequest} from "../../../../services/api.service";
+import {DataTable} from 'primereact/datatable';
+import {Column} from 'primereact/column';
+import {Doctor} from '../../../../types/Users/Doctor';
+import {LazyParams} from '../../../../types/data-table';
+import {Button} from 'primereact/button';
+import {useNavigate} from 'react-router-dom';
+import ConfirmationModal from '../../../../components/ConfirmationModal';
+import {authRequest} from '../../../../services/api.service';
 
 
 interface DoctorListProps {
