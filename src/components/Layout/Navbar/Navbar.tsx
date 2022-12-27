@@ -48,6 +48,11 @@ const Navbar: FC<NavbarProps> = () => {
             ],
 
         },
+        {
+            label: 'Statistics', icon: 'pi pi-fw pi-chart-bar', command: () => {
+                navigate('/statistics');
+            }
+        },
         logoutItem
     ];
 
@@ -59,6 +64,7 @@ const Navbar: FC<NavbarProps> = () => {
         },
         {
             label: 'Statistics', icon: 'pi pi-fw pi-chart-bar', command: () => {
+                navigate('/statistics');
             }
         },
         {

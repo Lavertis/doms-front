@@ -5,6 +5,7 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+import Statistics from "./pages/Statistics/Statistics";
 import AppointmentEdit from './pages/Appointments/AppointmentEdit';
 import AccountManagement from './pages/AccountManagement/AccountManagement';
 import ManageAppointment from './pages/Appointments/ManageAppointment/ManageAppointment';
@@ -72,6 +73,7 @@ function App() {
                             <Route path="/users" element={<UserManagement/>}/>
                             <Route path="/patients/:id" element={<PatientDetails/>}/>
                             <Route path="/doctors/:id" element={<DoctorDetails/>}/>
+                            <Route path="/statistics" element={<Statistics/>}/>
                         </Route>
 
                         <Route element={<ProtectedRoute allowedRoles={[Roles.Admin]}/>}>
