@@ -110,7 +110,7 @@ const UserManagement = () => {
 
     return (
         <div className="my-5 mx-auto col-11 xl:col-10">
-            <TabView>
+            <TabView className="shadow-1">
                 <TabPanel header="Patients">
                     <PatientList
                         patients={patients}

@@ -11,7 +11,7 @@ class AppointmentTypeStore {
     }
 
     async fetchAppointmentTypes() {
-        await authRequest.get('appointmentTypes')
+        await authRequest.get('appointment-types')
             .then((response: AxiosResponse<AppointmentType[]>) => {
                 this.appointmentTypes = response.data;
             })

@@ -51,7 +51,7 @@ const AddDoctor = () => {
 
     return (
         <div className="flex justify-content-center mt-8">
-            <div className="surface-card p-5 shadow-2 border-round col-12 sm:col-10 md:col-8 lg:col-6 xl:col-4">
+            <div className="surface-card p-5 shadow-1 border-round col-12 sm:col-10 md:col-8 lg:col-6 xl:col-4">
                 <div className="text-900 text-3xl font-medium mb-6 text-center">Add doctor</div>
                 <form onSubmit={formik.handleSubmit} className="p-fluid">
                     <div className="field mb-4">

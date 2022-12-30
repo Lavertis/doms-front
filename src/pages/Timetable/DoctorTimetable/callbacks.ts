@@ -102,19 +102,16 @@ export const saveChanges = async (eventStates: EventStates, calendarRef: any, to
 
         if (results.length === 0) {
             return;
-        }
-        else if (failedOps.length === results.length) {
+        } else if (failedOps.length === results.length) {
             toast.current.show({closable: false, severity: 'error', summary: (failedOps[1] as any)[0]});
-        }
-        else if (failedOps.length) {
+        } else if (failedOps.length) {
             toast.current.show({
                 closable: false,
                 severity: 'error',
                 summary: `Failed to: ${failedOps}`,
                 detail: (failedOps[1] as any)[0]
             });
-        }
-        else {
+        } else {
             toast.current.show({closable: false, severity: 'success', summary: 'Saved'});
         }
     });

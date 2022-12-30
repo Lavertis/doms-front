@@ -106,6 +106,11 @@ const Navbar: FC<NavbarProps> = () => {
             }
         },
         {
+            label: 'Sick leaves', icon: 'pi pi-fw pi-file', command: () => {
+                navigate('/sick-leaves');
+            }
+        },
+        {
             label: 'Timetable', icon: 'pi pi-fw pi-calendar', command: () => {
                 navigate('/timetable');
             }
@@ -134,9 +139,11 @@ const Navbar: FC<NavbarProps> = () => {
     return (
         <div className="card">
             <Menubar
-                model={getNavbarItemsByRole(userStore.user?.role || 'Guest')}
+                model={getNavbarItemsByRole(userStore.user?.role || Roles.Guest)}
                 start={
-                    <>{/*TODO Logo here*/}</>
+                    <div className="flex ml-1 mr-2">
+                        <img alt="Logo" src="https://img.icons8.com/dotty/480/000000/heart-with-pulse.png" width="40"/>
+                    </div>
                 }
             />
         </div>

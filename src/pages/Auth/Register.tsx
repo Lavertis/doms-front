@@ -95,7 +95,7 @@ const Register: FC<RegisterProps> = ({redirectTo}) => {
     }, [navigate, redirectTo]);
 
     return (
-        <div className="surface-card p-5 shadow-2 border-round w-full sm:w-7 lg:w-5 xl:w-4 mx-auto my-8">
+        <div className="surface-card p-5 shadow-1 border-round w-full sm:w-7 lg:w-5 xl:w-4 mx-auto my-8">
             <Toast ref={toast}/>
             <div className="text-center mb-5">
                 {/*TODO Logo here*/}

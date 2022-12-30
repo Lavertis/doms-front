@@ -24,6 +24,8 @@ import {ProgressSpinner} from 'primereact/progressspinner';
 import AppointmentSettings from './pages/Settings/AppointmentSettings/AppointmentSettings';
 import {Roles} from './enums/Roles';
 import TimetablePage from './pages/Timetable/TimetablePage';
+import PatientSickLeaveHistory from "./pages/SickLeaves/PatientSickLeaveHistory";
+import Home from "./pages/Home/Home";
 
 
 function App() {
@@ -67,6 +69,7 @@ function App() {
 
                         <Route element={<ProtectedRoute allowedRoles={[Roles.Patient]}/>}>
                             <Route path="/prescriptions" element={<PatientPrescriptionHistory/>}/>
+                            <Route path="/sick-leaves" element={<PatientSickLeaveHistory/>}/>
                         </Route>
 
                         <Route element={<ProtectedRoute allowedRoles={[Roles.Admin, Roles.Doctor]}/>}>
@@ -83,6 +86,8 @@ function App() {
                         <Route element={<ProtectedRoute allowedRoles={[Roles.Patient, Roles.Doctor]}/>}>
                             <Route path="/timetable" element={<TimetablePage/>}/>
                         </Route>
+
+                        <Route path="/" element={<Home/>}/>
                     </Routes>
                 </Layout>
             </BrowserRouter>

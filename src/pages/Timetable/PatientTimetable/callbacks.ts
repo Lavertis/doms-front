@@ -141,19 +141,16 @@ export const saveAppointments = (calendarRef: any, toast: any, eventStates: Even
 
         if (results.length === 0) {
             return;
-        }
-        else if (failedOps.length === results.length) {
+        } else if (failedOps.length === results.length) {
             toast.current.show({closable: false, severity: 'error', summary: (failedOps[0] as any)[1][0]});
-        }
-        else if (failedOps.length) {
+        } else if (failedOps.length) {
             toast.current.show({
                 closable: false,
                 severity: 'error',
                 summary: `Failed to: ${failedOps[0]}`,
                 detail: (failedOps[1] as any)[0]
             });
-        }
-        else {
+        } else {
             toast.current.show({closable: false, severity: 'success', summary: 'Saved'});
         }
     });

@@ -138,17 +138,24 @@ const PatientAppointmentsTable = () => {
     };
 
     const controlsTemplate = (rowData: Appointment) => {
-        const cancelButton = () => <Button label="" icon="pi pi-ban" className="p-button-danger"
+        const isCancelButtonShown = () => ![
+            AppointmentStatuses.Cancelled,
+            AppointmentStatuses.Completed,
+            AppointmentStatuses.Rejected
+        ].includes(rowData.status!.name as AppointmentStatuses);
+        const cancelButton = () => <Button label="" icon="pi pi-ban" className="p-button-danger" title="Cancel"
                                            onClick={() => {
                                                setCurrentAppointmentId(rowData.id);
                                                showModal();
                                            }}/>;
-        const viewButton = () => <Button label="" icon="pi pi-eye" className="p-button"
+
+        const isViewButtonShown = () => AppointmentStatuses.Completed === rowData.status!.name as AppointmentStatuses;
+        const viewButton = () => <Button label="" icon="pi pi-eye" className="p-button" title="View"
                                          onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}`)}/>;
 
         return <div className="flex justify-content-center">
-            {rowData.status?.name !== AppointmentStatuses.Completed && rowData.status?.name !== AppointmentStatuses.Cancelled && cancelButton()}
-            {rowData.status?.name === AppointmentStatuses.Completed && viewButton()}
+            {isCancelButtonShown() && cancelButton()}
+            {isViewButtonShown() && viewButton()}
         </div>;
     };
 
@@ -174,7 +181,7 @@ const PatientAppointmentsTable = () => {
                 rows={lazyParams.rows}
                 dataKey="id"
                 responsiveLayout="scroll"
-                className="my-8"
+                className="my-8 shadow-1 border-round"
             >
                 <Column
                     field="doctorName"

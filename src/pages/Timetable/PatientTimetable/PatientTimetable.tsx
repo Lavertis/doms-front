@@ -8,7 +8,6 @@ import {PagedResponse} from '../../../types/PagedResponse';
 import {AxiosResponse} from 'axios';
 import {DraggableEventData} from '../../../types/Timetable';
 import {backgroundGroupId, EventStates, newAppointmentColor} from './utils';
-import {AppointmentType} from '../../../types/Appointments/AppointmentType';
 import {Button} from 'primereact/button';
 import {observer} from 'mobx-react-lite';
 import {authRequest} from '../../../services/api.service';
@@ -21,6 +20,7 @@ import {
     saveAppointments,
     updateEventsCallback
 } from './callbacks';
+import appointmentTypeStore from "../../../store/appointment-type-store";
 
 interface PatientTimetableProps {
 }
@@ -55,18 +55,15 @@ const PatientTimetable: FC<PatientTimetableProps> = () => {
                     createdAt: new Date()
                 } as Doctor].concat(response.data.records));
             });
-        authRequest.get('appointmentTypes')  // TODO dont do request and get this from store
-            .then((response: AxiosResponse<AppointmentType[]>) => {
-                setDraggableEventsData(response.data.map((appointmentType) => {
-                    return ({
-                        id: appointmentType.id,
-                        title: `${appointmentType.name}, (New)`,
-                        durationMinutes: appointmentType.durationMinutes,
-                        color: newAppointmentColor,
-                        editable: false,
-                    });
-                }));
+        setDraggableEventsData(appointmentTypeStore.appointmentTypes.map((appointmentType) => {
+            return ({
+                id: appointmentType.id,
+                title: `${appointmentType.name}, (New)`,
+                durationMinutes: appointmentType.durationMinutes,
+                color: newAppointmentColor,
+                editable: false,
             });
+        }));
     }, []);
 
     const doctorOptionTemplate = (option: Doctor) => {

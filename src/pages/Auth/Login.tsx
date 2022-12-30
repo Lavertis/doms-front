@@ -29,7 +29,7 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
         validationSchema: LoginSchema,
         onSubmit: async values => {
             const signInResult = await userStore.signIn(values);
-            if(signInResult)
+            if (signInResult)
                 navigate(redirectTo, {replace: true});
             else
                 setError("Wrong credentials");
@@ -43,7 +43,7 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
     }, [navigate, redirectTo]);
 
     return (
-        <div className="surface-card p-5 shadow-2 border-round w-11 sm:w-7 lg:w-5 xl:w-4 mx-auto mt-8">
+        <div className="surface-card p-5 shadow-1 border-round w-11 sm:w-7 lg:w-5 xl:w-4 mx-auto mt-8">
             <div className="text-center mb-5">
                 {/*TODO Logo here*/}
                 {/*<img src="" alt="hyper" height={50} className="mb-3" />*/}

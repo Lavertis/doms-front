@@ -9,7 +9,7 @@ interface PatientAccountManagementProps {
 
 const PatientAccountManagement: FC<PatientAccountManagementProps> = () => {
     return (
-        <TabView className="w-6 mx-auto my-5">
+        <TabView className="w-6 mx-auto my-5 shadow-1 border-round">
             <TabPanel header="Update account">
                 <UpdatePatientAccountInfoForm/>
             </TabPanel>

@@ -45,10 +45,14 @@ const TextAreaWithMultipleChoiceButtons = ({
     }, [disabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
+        if (disabled)
+            return;
         if (formik.values[fieldName] !== "" && selectedValues.length === 0 && previousSelectedValuesCount > 0)
             formik.setFieldValue(fieldName, '');
-        if (selectedValues.length > 0)
+        if (selectedValues.length > 0) {
+            console.log('selectedValues', selectedValues);
             formik.setFieldValue(fieldName, selectedValues.map(p => p.name).join(', '));
+        }
         setPreviousSelectedValuesCount(selectedValues.length);
     }, [selectedValues]); // eslint-disable-line react-hooks/exhaustive-deps
 

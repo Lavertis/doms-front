@@ -114,14 +114,36 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
         return <>{moment(rowData.date).format('HH:mm')}</>;
     };
 
+    const isEditButtonShown = (rowData: Appointment) => {
+        return ![
+            AppointmentStatuses.Cancelled,
+            AppointmentStatuses.Rejected,
+            AppointmentStatuses.Completed
+        ].includes(rowData.status?.name as AppointmentStatuses);
+    }
+
+    const isStartButtonShown = (rowData: Appointment) => {
+        return ![
+            AppointmentStatuses.Cancelled,
+            AppointmentStatuses.Rejected,
+            AppointmentStatuses.Pending
+        ].includes(rowData.status?.name as AppointmentStatuses);
+    }
+
     const controlsTemplate = (rowData: Appointment) => {
         return <div className="flex justify-content-center">
-            <Button onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}/edit`)} icon="pi pi-cog"/>
-            <Button
-                className={'ml-1 ' + (rowData.status?.name === AppointmentStatuses.Completed ? 'p-button-info' : 'p-button-success')}
-                onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}`)}
-                icon={'pi ' + (rowData.status?.name === AppointmentStatuses.Completed ? 'pi-eye' : 'pi-caret-right')}
-            />
+            {
+                isEditButtonShown(rowData) &&
+                <Button onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}/edit`)} icon="pi pi-cog"/>
+            }
+            {
+                isStartButtonShown(rowData) &&
+                <Button
+                    className={'ml-1 ' + (rowData.status?.name === AppointmentStatuses.Completed ? 'p-button-info' : 'p-button-success')}
+                    onClick={() => navigate(`/appointments/${uuidToBase64(rowData.id)}`)}
+                    icon={'pi ' + (rowData.status?.name === AppointmentStatuses.Completed ? 'pi-eye' : 'pi-caret-right')}
+                />
+            }
         </div>;
     };
 
@@ -146,7 +168,7 @@ const DoctorAppointmentsTable: FC<DoctorAppointmentsTableProps> = () => {
             rows={lazyParams.rows}
             dataKey="id"
             responsiveLayout="scroll"
-            className="my-8"
+            className="my-8 shadow-1 border-round"
         >
             <Column field="patientFirstName" header="First name"/>
             <Column field="patientLastName" header="Last name"/>

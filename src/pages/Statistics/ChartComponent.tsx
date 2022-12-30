@@ -21,7 +21,7 @@ function ChartComponent({data, totalCount}: ChartComponentProps) {
             dataz.push(value as number);
         }
 
-        setChartData ({
+        setChartData({
             labels: labelz,
             datasets: [
                 {

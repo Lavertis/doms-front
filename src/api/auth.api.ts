@@ -5,12 +5,12 @@ export interface SignInRequest {
     password: string;
 }
 
-export const signIn = async ({ login, password }: SignInRequest): Promise<string | false> => {
+export const signIn = async ({login, password}: SignInRequest): Promise<string | false> => {
     try {
         const signInResponse = await request.post('/auth/authenticate', {
             login,
             password,
-        },{
+        }, {
             withCredentials: true
         });
         return signInResponse.data.jwtToken;

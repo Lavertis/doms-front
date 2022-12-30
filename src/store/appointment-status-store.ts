@@ -11,7 +11,7 @@ class AppointmentStatusStore {
     }
 
     fetchAppointmentStatuses() {
-        return authRequest.get('appointmentStatuses')
+        return authRequest.get('appointment-statuses')
             .then((response: AxiosResponse<AppointmentStatus[]>) => {
                 this.appointmentStatuses = response.data;
             })

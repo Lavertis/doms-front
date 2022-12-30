@@ -9,11 +9,15 @@ import appointmentTypeStore from './appointment-type-store';
 import appointmentStatusStore from './appointment-status-store';
 
 class UserStore {
+    user: IUser | null = null;
+
     constructor() {
         makeObservable(this, {user: observable, getUserData: action});
     }
 
-    user: IUser | null = null;
+    get isLoggedIn() {
+        return this.user != null;
+    }
 
     async getUserData(jwtToken: string) {
         if (!!jwtToken) {
@@ -53,10 +57,6 @@ class UserStore {
                 this.user = null;
             });
     };
-
-    get isLoggedIn() {
-        return this.user != null;
-    }
 }
 
 const userStore = new UserStore();

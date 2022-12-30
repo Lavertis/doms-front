@@ -8,7 +8,7 @@ interface DoctorAccountManagementProps {
 
 const DoctorAccountManagement: FC<DoctorAccountManagementProps> = () => {
     return (
-        <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6 mx-auto mt-5">
+        <div className="surface-card p-4 shadow-1 border-round w-full lg:w-6 mx-auto mt-5">
             <TabView className="">
                 <TabPanel header="Update account">
                     <UpdateDoctorAccountInfoForm/>

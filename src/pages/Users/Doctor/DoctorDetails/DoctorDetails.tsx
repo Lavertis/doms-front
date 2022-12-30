@@ -17,7 +17,7 @@ const DoctorDetails = () => {
             .catch(error => {
                 console.log(error);
             });
-    }, [ id]);
+    }, [id]);
 
     return (
         <div className="col-11 lg:col-10 xl:col-8 mx-auto">

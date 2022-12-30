@@ -22,15 +22,15 @@ const MultipleChoiceButtons = (props: MultipleChoiceButtonsProps) => {
     return (
         <div className="grid align-content-start">
             {props.availableValues.map(value => {
-                const isSelected = props.selectedValues.some(s => s.id === value.id);
-                const className = isSelected ? '' : 'p-button-outlined';
-                return (
-                    <Button
-                        key={value.id}
-                        label={value.name}
-                        className={className + buttonClassNames}
-                        onClick={() => onSelectedChange(value)}
-                        disabled={props.disabled}
+                    const isSelected = props.selectedValues.some(s => s.id === value.id);
+                    const className = isSelected ? '' : 'p-button-outlined';
+                    return (
+                        <Button
+                            key={value.id}
+                            label={value.name}
+                            className={className + buttonClassNames}
+                            onClick={() => onSelectedChange(value)}
+                            disabled={props.disabled}
                         />
                     )
                 }

@@ -99,7 +99,7 @@ const Timetable: FC<TimetableProps> = (
             <div
                 className="mt-4 xl:mt-0 xl:w-16rem shadow-1 border-round bg-white ml-3 text-center py-4 px-6 xl:px-3 xl:py-0 flex-wrap flex flex-row xl:flex-column justify-content-between xl:justify-content-start align-items-center"
                 id={eventContainerId}>
-                <h3 className="hidden xl:block">Appointment types</h3>
+                <h3 className="hidden xl:block">Actions</h3>
                 {sidebarContent}
                 <div className="flex xl:flex-column align-items-center xl:w-full">
                     {showDraggableEvents && <div className="xl:mt-5 mx-1 xl:mx-0">

@@ -2,6 +2,8 @@ import React from 'react';
 import {SickLeave} from "../../../../types/sickLeave";
 import AddSickLeave from "../../../../components/SickLeave/AddSickLeave";
 import SickLeaves from "../../../../components/SickLeave/SickLeaves";
+import userStore from "../../../../store/user-store";
+import {Roles} from "../../../../enums/Roles";
 
 interface SickLeavesPanelProps {
     appointmentId: string;
@@ -21,11 +23,13 @@ const SickLeavesPanelContent = ({
 
     return (
         <div>
-            <AddSickLeave
-                patientId={patientId}
-                appointmentId={appointmentId}
-                fetchSickLeaves={fetchSickLeaves}
-            />
+            {userStore.user?.role === Roles.Doctor &&
+                <AddSickLeave
+                    patientId={patientId}
+                    appointmentId={appointmentId}
+                    fetchSickLeaves={fetchSickLeaves}
+                />
+            }
             <div className="mt-5">
                 <div className="text-center mb-5">
                     <div className="text-900 text-2xl font-medium mb-3">
